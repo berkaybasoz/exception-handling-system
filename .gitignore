@@ -34,3 +34,12 @@ README_berkay.md
 # Application specific
 /demo-app/src/main/resources/application-local.yml
 /exception-monitor/src/main/resources/application-local.yml
+.gradle/file-system.probe
+.gradle/8.4/checksums/checksums.lock
+.gradle/8.4/dependencies-accessors/dependencies-accessors.lock
+.gradle/8.4/executionHistory/executionHistory.bin
+.gradle/8.4/executionHistory/executionHistory.lock
+.gradle/8.4/fileHashes/fileHashes.bin
+.gradle/8.4/fileHashes/fileHashes.lock
+.gradle/8.4/fileHashes/resourceHashesCache.bin
+.gradle/buildOutputCleanup/buildOutputCleanup.lock

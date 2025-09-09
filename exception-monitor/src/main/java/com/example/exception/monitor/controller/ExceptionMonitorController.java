@@ -64,6 +64,8 @@ public class ExceptionMonitorController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String projectName,
             @RequestParam(required = false) String exceptionType,
+            @RequestParam(required = false) String environment,
+            @RequestParam(required = false) String componentName,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             Model model) {
@@ -71,20 +73,16 @@ public class ExceptionMonitorController {
         Pageable pageable = PageRequest.of(page, size);
         Page<ExceptionRecord> exceptions;
         
-        if (projectName != null && !projectName.trim().isEmpty()) {
-            exceptions = exceptionRecordService.findByProject(projectName.trim(), pageable);
-        } else if (exceptionType != null && !exceptionType.trim().isEmpty()) {
-            exceptions = exceptionRecordService.findByExceptionType(exceptionType.trim(), pageable);
-        } else if (startDate != null && endDate != null) {
-            exceptions = exceptionRecordService.findByDateRange(startDate, endDate, pageable);
-        } else {
-            exceptions = exceptionRecordService.findAll(pageable);
-        }
+        // Use the combined filter method for better performance and functionality
+        exceptions = exceptionRecordService.findWithFilters(projectName, exceptionType, environment, 
+                                                           componentName, startDate, endDate, pageable);
         
         model.addAttribute("exceptions", exceptions);
         model.addAttribute("currentPage", page);
         model.addAttribute("projectName", projectName);
         model.addAttribute("exceptionType", exceptionType);
+        model.addAttribute("environment", environment);
+        model.addAttribute("componentName", componentName);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         

@@ -98,7 +98,10 @@
                                 </thead>
                                 <tbody>
                                     <tr th:each="stat : ${exceptionTypeStats}" th:if="${statStat.index < 10}">
-                                        <td th:text="${stat[0]}">ExceptionType</td>
+                                        <td>
+                                            <a th:href="@{/exceptions(exceptionType=${stat[0]})}" 
+                                               th:text="${stat[0]}">ExceptionType</a>
+                                        </td>
                                         <td>
                                             <span class="badge bg-danger" th:text="${stat[1]}">0</span>
                                         </td>
@@ -164,7 +167,8 @@
                                     <tr th:each="stat : ${componentStats}" th:if="${statStat.index < 10}">
                                         <td>
                                             <i class="fas fa-microchip text-info"></i>
-                                            <span th:text="${stat[0]}">ComponentName</span>
+                                            <a th:href="@{/exceptions(componentName=${stat[0]})}" 
+                                               th:text="${stat[0]}">ComponentName</a>
                                         </td>
                                         <td>
                                             <span class="badge bg-info" th:text="${stat[1]}">0</span>
@@ -196,7 +200,8 @@
                                     <tr th:each="stat : ${environmentStats}" th:if="${statStat.index < 10}">
                                         <td>
                                             <i class="fas fa-globe text-success"></i>
-                                            <span th:text="${stat[0]}">Environment</span>
+                                            <a th:href="@{/exceptions(environment=${stat[0]})}" 
+                                               th:text="${stat[0]}">Environment</a>
                                         </td>
                                         <td>
                                             <span class="badge bg-success" th:text="${stat[1]}">0</span>

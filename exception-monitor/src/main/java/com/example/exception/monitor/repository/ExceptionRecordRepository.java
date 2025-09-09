@@ -23,6 +23,27 @@ public interface ExceptionRecordRepository extends JpaRepository<ExceptionRecord
     Page<ExceptionRecord> findByTimestampBetweenOrderByTimestampDesc(
         LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
     
+    Page<ExceptionRecord> findByEnvironmentOrderByTimestampDesc(String environment, Pageable pageable);
+    
+    Page<ExceptionRecord> findByComponentNameOrderByTimestampDesc(String componentName, Pageable pageable);
+    
+    @Query("SELECT e FROM ExceptionRecord e WHERE " +
+           "(:projectName IS NULL OR e.projectName = :projectName) AND " +
+           "(:exceptionType IS NULL OR e.exceptionType = :exceptionType) AND " +
+           "(:environment IS NULL OR e.environment = :environment) AND " +
+           "(:componentName IS NULL OR e.componentName = :componentName) AND " +
+           "(:startDate IS NULL OR e.timestamp >= :startDate) AND " +
+           "(:endDate IS NULL OR e.timestamp <= :endDate) " +
+           "ORDER BY e.timestamp DESC")
+    Page<ExceptionRecord> findWithFilters(
+        @Param("projectName") String projectName,
+        @Param("exceptionType") String exceptionType,
+        @Param("environment") String environment,
+        @Param("componentName") String componentName,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate,
+        Pageable pageable);
+    
     @Query("SELECT e.exceptionType, COUNT(e) FROM ExceptionRecord e GROUP BY e.exceptionType ORDER BY COUNT(e) DESC")
     List<Object[]> getExceptionTypeStatistics();
     

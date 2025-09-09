@@ -32,15 +32,25 @@
             <div class="card-body">
                 <form method="get" action="/exceptions">
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label for="projectName" class="form-label">Project Name</label>
                             <input type="text" class="form-control" id="projectName" name="projectName" 
                                    th:value="${projectName}" placeholder="Enter project name">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label for="exceptionType" class="form-label">Exception Type</label>
                             <input type="text" class="form-control" id="exceptionType" name="exceptionType" 
                                    th:value="${exceptionType}" placeholder="Enter exception type">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="environment" class="form-label">Environment</label>
+                            <input type="text" class="form-control" id="environment" name="environment" 
+                                   th:value="${environment}" placeholder="Enter environment">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="componentName" class="form-label">Component</label>
+                            <input type="text" class="form-control" id="componentName" name="componentName" 
+                                   th:value="${componentName}" placeholder="Enter component">
                         </div>
                         <div class="col-md-2">
                             <label for="startDate" class="form-label">Start Date</label>
@@ -52,7 +62,9 @@
                             <input type="datetime-local" class="form-control" id="endDate" name="endDate" 
                                    th:value="${endDate}">
                         </div>
-                        <div class="col-md-2 d-flex align-items-end">
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12">
                             <button type="submit" class="btn btn-primary me-2">
                                 <i class="fas fa-search"></i> Filter
                             </button>
@@ -80,7 +92,8 @@
                                 <th>Exception Type</th>
                                 <th>Message</th>
                                 <th>Project</th>
-                                <th>Pod</th>
+                                <th>Environment</th>
+                                <th>Component</th>
                                 <th>Method</th>
                                 <th>Action</th>
                             </tr>
@@ -104,9 +117,18 @@
                                         ProjectName
                                     </span>
                                 </td>
-                                <td th:text="${exception.podName ?: 'N/A'}">PodName</td>
                                 <td>
-                                    <span class="badge bg-info" th:text="${exception.method ?: 'N/A'}">
+                                    <span class="badge bg-success" th:text="${exception.environment ?: 'N/A'}">
+                                        Environment
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info" th:text="${exception.componentName ?: 'N/A'}">
+                                        ComponentName
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary" th:text="${exception.method ?: 'N/A'}">
                                         GET
                                     </span>
                                 </td>
@@ -125,7 +147,7 @@
                 <nav aria-label="Exception pagination" th:if="${exceptions.totalPages > 1}">
                     <ul class="pagination justify-content-center">
                         <li class="page-item" th:classappend="${!exceptions.hasPrevious()} ? 'disabled'">
-                            <a class="page-link" th:href="@{/exceptions(page=${currentPage - 1}, projectName=${projectName}, exceptionType=${exceptionType}, startDate=${startDate}, endDate=${endDate})}">
+                            <a class="page-link" th:href="@{/exceptions(page=${currentPage - 1}, projectName=${projectName}, exceptionType=${exceptionType}, environment=${environment}, componentName=${componentName}, startDate=${startDate}, endDate=${endDate})}">
                                 <i class="fas fa-chevron-left"></i> Previous
                             </a>
                         </li>
@@ -133,12 +155,12 @@
                         <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, exceptions.totalPages - 1)}"
                             th:classappend="${pageNum == currentPage} ? 'active'"
                             th:if="${pageNum >= (currentPage - 2) and pageNum <= (currentPage + 2)}">
-                            <a class="page-link" th:href="@{/exceptions(page=${pageNum}, projectName=${projectName}, exceptionType=${exceptionType}, startDate=${startDate}, endDate=${endDate})}"
+                            <a class="page-link" th:href="@{/exceptions(page=${pageNum}, projectName=${projectName}, exceptionType=${exceptionType}, environment=${environment}, componentName=${componentName}, startDate=${startDate}, endDate=${endDate})}"
                                th:text="${pageNum + 1}">1</a>
                         </li>
                         
                         <li class="page-item" th:classappend="${!exceptions.hasNext()} ? 'disabled'">
-                            <a class="page-link" th:href="@{/exceptions(page=${currentPage + 1}, projectName=${projectName}, exceptionType=${exceptionType}, startDate=${startDate}, endDate=${endDate})}">
+                            <a class="page-link" th:href="@{/exceptions(page=${currentPage + 1}, projectName=${projectName}, exceptionType=${exceptionType}, environment=${environment}, componentName=${componentName}, startDate=${startDate}, endDate=${endDate})}">
                                 Next <i class="fas fa-chevron-right"></i>
                             </a>
                         </li>

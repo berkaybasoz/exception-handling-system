@@ -40,6 +40,29 @@ public class ExceptionRecordService {
         return repository.findByTimestampBetweenOrderByTimestampDesc(startDate, endDate, pageable);
     }
     
+    public Page<ExceptionRecord> findByEnvironment(String environment, Pageable pageable) {
+        return repository.findByEnvironmentOrderByTimestampDesc(environment, pageable);
+    }
+    
+    public Page<ExceptionRecord> findByComponentName(String componentName, Pageable pageable) {
+        return repository.findByComponentNameOrderByTimestampDesc(componentName, pageable);
+    }
+    
+    public Page<ExceptionRecord> findWithFilters(String projectName, String exceptionType, 
+                                               String environment, String componentName,
+                                               LocalDateTime startDate, LocalDateTime endDate, 
+                                               Pageable pageable) {
+        
+        String normalizedProjectName = (projectName != null && projectName.trim().isEmpty()) ? null : projectName;
+        String normalizedExceptionType = (exceptionType != null && exceptionType.trim().isEmpty()) ? null : exceptionType;
+        String normalizedEnvironment = (environment != null && environment.trim().isEmpty()) ? null : environment;
+        String normalizedComponentName = (componentName != null && componentName.trim().isEmpty()) ? null : componentName;
+        
+        return repository.findWithFilters(normalizedProjectName, normalizedExceptionType, 
+                                        normalizedEnvironment, normalizedComponentName,
+                                        startDate, endDate, pageable);
+    }
+    
     public Optional<ExceptionRecord> findById(String id) {
         return repository.findById(id);
     }
