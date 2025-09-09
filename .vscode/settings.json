@@ -1,0 +1,14 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "spring-boot.ls.java.home": null,
+    "spring-boot.ls.checkJVM": true,
+    "java.debug.settings.hotCodeReplace": "auto",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-17",
+            "path": "/usr/local/opt/openjdk@17",
+            "default": true
+        }
+    ]
+}

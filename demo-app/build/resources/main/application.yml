@@ -1,0 +1,12 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: demo-app
+    
+logging:
+  level:
+    com.example.demo: DEBUG
+    com.example.exception.handler: DEBUG
+    org.springframework.kafka: INFO

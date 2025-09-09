@@ -1,0 +1,97 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.example",
+    "module": "exception-handler-library",
+    "version": "1.0.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.4"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "exception-handler-library-1.0.0.jar",
+          "url": "exception-handler-library-1.0.0.jar",
+          "size": 13598,
+          "sha512": "0897363f2113e968f8f67c5049225379367e4f8479ed1fa308d747fa62103450551c4aaec0a95a46b7097d06b486be6e121eec79825675e118a327ec55836337",
+          "sha256": "649733be72a52d3759244334f2e7112feef3b2255dcf26fb844d263dd1a22a7e",
+          "sha1": "f56542f1f3f0b6c97320af85376a2762dd2cff48",
+          "md5": "4e72cc1290ceea2c0b2e79104e47a4ab"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter",
+          "version": {
+            "requires": "3.2.0"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-web",
+          "version": {
+            "requires": "3.2.0"
+          }
+        },
+        {
+          "group": "org.springframework.kafka",
+          "module": "spring-kafka",
+          "version": {
+            "requires": "3.1.0"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.15.3"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-configuration-processor",
+          "version": {
+            "requires": "3.2.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "exception-handler-library-1.0.0.jar",
+          "url": "exception-handler-library-1.0.0.jar",
+          "size": 13598,
+          "sha512": "0897363f2113e968f8f67c5049225379367e4f8479ed1fa308d747fa62103450551c4aaec0a95a46b7097d06b486be6e121eec79825675e118a327ec55836337",
+          "sha256": "649733be72a52d3759244334f2e7112feef3b2255dcf26fb844d263dd1a22a7e",
+          "sha1": "f56542f1f3f0b6c97320af85376a2762dd2cff48",
+          "md5": "4e72cc1290ceea2c0b2e79104e47a4ab"
+        }
+      ]
+    }
+  ]
+}

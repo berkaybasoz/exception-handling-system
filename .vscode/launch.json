@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug Exception Monitor",
+            "request": "launch",
+            "mainClass": "com.example.exception.monitor.ExceptionMonitorApplication",
+            "projectName": "exception-monitor",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Debug Demo App",
+            "request": "launch",
+            "mainClass": "com.example.demo.DemoApplication",
+            "projectName": "demo-app",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Debug All",
+            "request": "launch",
+            "compounds": ["Debug Exception Monitor", "Debug Demo App"]
+        }
+    ]
+}

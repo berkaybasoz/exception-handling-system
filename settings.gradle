@@ -1,0 +1,5 @@
+rootProject.name = 'exception-handling-system'
+
+include 'exception-handler-library'
+include 'demo-app'
+include 'exception-monitor'
