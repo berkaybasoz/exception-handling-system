@@ -191,9 +191,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="param : ${requestParameters.fields()}">
-                                        <td><code th:text="${param.key}">type</code></td>
-                                        <td th:text="${param.value.isArray() ? param.value : param.value.asText()}">runtime</td>
+                                    <tr th:each="reqParam : ${requestParameters.fields()}">
+                                        <td><code th:text="${reqParam.key}">type</code></td>
+                                        <td th:text="${reqParam.value.isArray() ? reqParam.value.get(0).asText() : reqParam.value.asText()}">runtime</td>
                                     </tr>
                                 </tbody>
                             </table>
