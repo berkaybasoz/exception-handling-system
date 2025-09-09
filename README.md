@@ -88,6 +88,13 @@ curl -X POST "http://localhost:8092/api/user/999" \
   -d '{"name": "Test User"}'
 ```
 
+5. **Exception with HTTP Headers Test**
+```bash
+curl -H "X-Custom-Header: TestValue" \
+     -H "Accept: application/json" \
+     "http://localhost:8092/api/throw-exception-with-headers?type=runtime"
+```
+
 ## Monitoring Arayüzü
 
 Exception Monitor web arayüzü şu özellikleri sunar:
@@ -130,11 +137,19 @@ private ExceptionHandler exceptionHandler;
 try {
     // Risky operation
 } catch (Exception e) {
+    // Basit kullanım
     exceptionHandler.handle(e);
-    // veya ek data ile
+    
+    // Ek data ile
     Map<String, Object> additionalData = new HashMap<>();
     additionalData.put("userId", userId);
     exceptionHandler.handle(e, additionalData);
+    
+    // HTTP headers'ı otomatik olarak ekler
+    exceptionHandler.handleWithHttpHeaders(e);
+    
+    // HTTP headers + ek data
+    exceptionHandler.handleWithHttpHeaders(e, additionalData);
 }
 ```
 

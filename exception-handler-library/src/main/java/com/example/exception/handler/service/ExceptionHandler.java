@@ -51,6 +51,32 @@ public class ExceptionHandler {
         }
     }
     
+    public void handleWithHttpHeaders(Exception exception) {
+        handleWithHttpHeaders(exception, null);
+    }
+    
+    public void handleWithHttpHeaders(Exception exception, Map<String, Object> additionalData) {
+        try {
+            // HTTP headers'ı otomatik olarak additional data'ya ekle
+            Map<String, Object> enhancedData = enhanceWithHttpHeaders(additionalData);
+            
+            ExceptionDto dto = createExceptionDto(exception, enhancedData);
+            
+            // Kafka'ya gönder
+            String jsonDto = objectMapper.writeValueAsString(dto);
+            kafkaTemplate.send(properties.getKafka().getTopic(), dto.getId(), jsonDto);
+            
+            // Loga yaz
+            log.error("Exception handled with HTTP headers and sent to Kafka: {} - {}", 
+                dto.getExceptionType(), dto.getMessage(), exception);
+                
+        } catch (JsonProcessingException e) {
+            log.error("Error serializing exception DTO", e);
+        } catch (Exception e) {
+            log.error("Error handling exception", e);
+        }
+    }
+    
     private ExceptionDto createExceptionDto(Exception exception, Map<String, Object> additionalData) {
         ExceptionDto dto = new ExceptionDto();
         dto.setId(UUID.randomUUID().toString());
@@ -85,6 +111,72 @@ public class ExceptionHandler {
         dto.setAdditionalData(additionalData != null ? additionalData : new HashMap<>());
         
         return dto;
+    }
+    
+    private Map<String, Object> enhanceWithHttpHeaders(Map<String, Object> existingData) {
+        Map<String, Object> enhancedData = existingData != null ? new HashMap<>(existingData) : new HashMap<>();
+        
+        try {
+            ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            HttpServletRequest request = attr.getRequest();
+            
+            // HTTP Headers'ı additional data'ya ekle
+            Map<String, Object> httpHeaders = new HashMap<>();
+            
+            // Yaygın header'ları ekle
+            addHeaderIfPresent(httpHeaders, request, "Accept");
+            addHeaderIfPresent(httpHeaders, request, "Accept-Language");
+            addHeaderIfPresent(httpHeaders, request, "Accept-Encoding");
+            addHeaderIfPresent(httpHeaders, request, "Content-Type");
+            addHeaderIfPresent(httpHeaders, request, "Content-Length");
+            addHeaderIfPresent(httpHeaders, request, "Authorization");
+            addHeaderIfPresent(httpHeaders, request, "X-Forwarded-For");
+            addHeaderIfPresent(httpHeaders, request, "X-Real-IP");
+            addHeaderIfPresent(httpHeaders, request, "X-Forwarded-Proto");
+            addHeaderIfPresent(httpHeaders, request, "Origin");
+            addHeaderIfPresent(httpHeaders, request, "Referer");
+            addHeaderIfPresent(httpHeaders, request, "Host");
+            addHeaderIfPresent(httpHeaders, request, "Connection");
+            addHeaderIfPresent(httpHeaders, request, "Cache-Control");
+            
+            // Custom header'ları ekle (X- ile başlayan)
+            request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
+                if (headerName.toLowerCase().startsWith("x-") && 
+                    !httpHeaders.containsKey(headerName)) {
+                    addHeaderIfPresent(httpHeaders, request, headerName);
+                }
+            });
+            
+            enhancedData.put("httpHeaders", httpHeaders);
+            
+            // Request parametreleri
+            if (!request.getParameterMap().isEmpty()) {
+                enhancedData.put("requestParameters", new HashMap<>(request.getParameterMap()));
+            }
+            
+            // Remote address bilgileri
+            enhancedData.put("remoteAddress", request.getRemoteAddr());
+            enhancedData.put("remoteHost", request.getRemoteHost());
+            enhancedData.put("remotePort", request.getRemotePort());
+            
+        } catch (IllegalStateException e) {
+            // Request context yok, web dışı bir ortam
+            log.debug("No HTTP request context available for header extraction");
+        }
+        
+        return enhancedData;
+    }
+    
+    private void addHeaderIfPresent(Map<String, Object> headers, HttpServletRequest request, String headerName) {
+        String headerValue = request.getHeader(headerName);
+        if (headerValue != null && !headerValue.trim().isEmpty()) {
+            // Authorization header'ı güvenlik için mask'le
+            if ("Authorization".equalsIgnoreCase(headerName)) {
+                headers.put(headerName, "***MASKED***");
+            } else {
+                headers.put(headerName, headerValue);
+            }
+        }
     }
     
     private String getStackTrace(Exception exception) {

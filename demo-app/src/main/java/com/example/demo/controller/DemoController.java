@@ -101,4 +101,23 @@ public class DemoController {
                 .body("Validation failed - error logged");
         }
     }
+    
+    @GetMapping("/throw-exception-with-headers")
+    public ResponseEntity<String> throwExceptionWithHeaders(@RequestParam(defaultValue = "runtime") String type) {
+        try {
+            demoService.throwException(type);
+            return ResponseEntity.ok("No exception thrown");
+        } catch (Exception e) {
+            // HTTP headers ile exception handler kullanımı
+            Map<String, Object> additionalData = new HashMap<>();
+            additionalData.put("requestType", type);
+            additionalData.put("endpoint", "/throw-exception-with-headers");
+            additionalData.put("testData", "This exception includes HTTP headers automatically");
+            
+            exceptionHandler.handleWithHttpHeaders(e, additionalData);
+            
+            return ResponseEntity.internalServerError()
+                .body("Exception occurred with HTTP headers and sent to monitoring system");
+        }
+    }
 }

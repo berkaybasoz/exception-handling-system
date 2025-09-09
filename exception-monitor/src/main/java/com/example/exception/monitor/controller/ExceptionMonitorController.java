@@ -2,6 +2,8 @@ package com.example.exception.monitor.controller;
 
 import com.example.exception.monitor.entity.ExceptionRecord;
 import com.example.exception.monitor.service.ExceptionRecordService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +24,7 @@ import java.util.Optional;
 public class ExceptionMonitorController {
     
     private final ExceptionRecordService exceptionRecordService;
+    private final ObjectMapper objectMapper;
     
     @GetMapping("/")
     public String dashboard(Model model) {
@@ -83,7 +86,41 @@ public class ExceptionMonitorController {
         Optional<ExceptionRecord> exception = exceptionRecordService.findById(id);
         
         if (exception.isPresent()) {
-            model.addAttribute("exception", exception.get());
+            ExceptionRecord record = exception.get();
+            model.addAttribute("exception", record);
+            
+            // Additional data'yı parse et
+            try {
+                if (record.getAdditionalData() != null && !record.getAdditionalData().trim().isEmpty()) {
+                    JsonNode additionalDataJson = objectMapper.readTree(record.getAdditionalData());
+                    model.addAttribute("additionalDataJson", additionalDataJson);
+                    
+                    // HTTP headers'ı ayrı olarak ekle
+                    if (additionalDataJson.has("httpHeaders")) {
+                        model.addAttribute("httpHeaders", additionalDataJson.get("httpHeaders"));
+                    }
+                    
+                    // Request parameters'ı ayrı olarak ekle
+                    if (additionalDataJson.has("requestParameters")) {
+                        model.addAttribute("requestParameters", additionalDataJson.get("requestParameters"));
+                    }
+                    
+                    // Remote info'yu ayrı olarak ekle
+                    if (additionalDataJson.has("remoteAddress")) {
+                        model.addAttribute("remoteAddress", additionalDataJson.get("remoteAddress").asText());
+                    }
+                    if (additionalDataJson.has("remoteHost")) {
+                        model.addAttribute("remoteHost", additionalDataJson.get("remoteHost").asText());
+                    }
+                    if (additionalDataJson.has("remotePort")) {
+                        model.addAttribute("remotePort", additionalDataJson.get("remotePort").asText());
+                    }
+                }
+            } catch (Exception e) {
+                // JSON parse hatası durumunda raw data'yı göster
+                model.addAttribute("additionalDataParseError", true);
+            }
+            
             return "exception-detail";
         } else {
             return "redirect:/exceptions";
