@@ -33,29 +33,86 @@ public class ExceptionMonitorController {
     private String applicationVersion;
     
     @GetMapping("/")
-    public String dashboard(Model model) {
+    public String dashboard(
+            @RequestParam(required = false) String timeRange,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime customStartDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime customEndDate,
+            Model model) {
+        
         // Application version
         model.addAttribute("applicationVersion", applicationVersion);
+        
+        // Calculate date range based on timeRange parameter
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = LocalDateTime.now();
+        
+        if (timeRange != null && !timeRange.isEmpty()) {
+            switch (timeRange) {
+                case "5m":
+                    startDate = endDate.minusMinutes(5);
+                    break;
+                case "15m":
+                    startDate = endDate.minusMinutes(15);
+                    break;
+                case "30m":
+                    startDate = endDate.minusMinutes(30);
+                    break;
+                case "1h":
+                    startDate = endDate.minusHours(1);
+                    break;
+                case "6h":
+                    startDate = endDate.minusHours(6);
+                    break;
+                case "12h":
+                    startDate = endDate.minusHours(12);
+                    break;
+                case "1d":
+                    startDate = endDate.minusDays(1);
+                    break;
+                case "7d":
+                    startDate = endDate.minusDays(7);
+                    break;
+                case "30d":
+                    startDate = endDate.minusDays(30);
+                    break;
+                case "custom":
+                    if (customStartDate != null && customEndDate != null) {
+                        startDate = customStartDate;
+                        endDate = customEndDate;
+                    }
+                    break;
+                default:
+                    // Default to last 24 hours
+                    startDate = endDate.minusHours(24);
+            }
+        } else {
+            // Default to last 24 hours
+            startDate = endDate.minusHours(24);
+        }
         
         // Dashboard statistics
         model.addAttribute("totalExceptions", exceptionRecordService.getTotalExceptions());
         model.addAttribute("exceptionsLast24h", exceptionRecordService.getExceptionsInLast24Hours());
         model.addAttribute("exceptionsLastHour", exceptionRecordService.getExceptionsInLastHour());
+        model.addAttribute("exceptionsInRange", exceptionRecordService.getExceptionsByTimeRange(startDate, endDate));
+        model.addAttribute("selectedTimeRange", timeRange != null ? timeRange : "24h");
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
         
-        // Top exception types
-        List<Object[]> exceptionTypeStats = exceptionRecordService.getExceptionTypeStatistics();
+        // Top exception types (with time filtering)
+        List<Object[]> exceptionTypeStats = exceptionRecordService.getExceptionTypeStatistics(startDate, endDate);
         model.addAttribute("exceptionTypeStats", exceptionTypeStats);
         
-        // Top projects
-        List<Object[]> projectStats = exceptionRecordService.getProjectStatistics();
+        // Top projects (with time filtering)
+        List<Object[]> projectStats = exceptionRecordService.getProjectStatistics(startDate, endDate);
         model.addAttribute("projectStats", projectStats);
         
-        // Component statistics
-        List<Object[]> componentStats = exceptionRecordService.getComponentStatistics();
+        // Component statistics (with time filtering)
+        List<Object[]> componentStats = exceptionRecordService.getComponentStatistics(startDate, endDate);
         model.addAttribute("componentStats", componentStats);
         
-        // Environment statistics
-        List<Object[]> environmentStats = exceptionRecordService.getEnvironmentStatistics();
+        // Environment statistics (with time filtering)
+        List<Object[]> environmentStats = exceptionRecordService.getEnvironmentStatistics(startDate, endDate);
         model.addAttribute("environmentStats", environmentStats);
         
         // Recent exceptions
@@ -73,16 +130,70 @@ public class ExceptionMonitorController {
             @RequestParam(required = false) String exceptionType,
             @RequestParam(required = false) String environment,
             @RequestParam(required = false) String componentName,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @RequestParam(required = false) String serviceName,
+            @RequestParam(required = false) String method,
+            @RequestParam(required = false) String timeRange,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime customStartDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime customEndDate,
             Model model) {
+        
+        // Calculate date range based on timeRange parameter
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = LocalDateTime.now();
+        
+        if (timeRange != null && !timeRange.isEmpty()) {
+            switch (timeRange) {
+                case "5m":
+                    startDate = endDate.minusMinutes(5);
+                    break;
+                case "15m":
+                    startDate = endDate.minusMinutes(15);
+                    break;
+                case "30m":
+                    startDate = endDate.minusMinutes(30);
+                    break;
+                case "1h":
+                    startDate = endDate.minusHours(1);
+                    break;
+                case "6h":
+                    startDate = endDate.minusHours(6);
+                    break;
+                case "12h":
+                    startDate = endDate.minusHours(12);
+                    break;
+                case "1d":
+                    startDate = endDate.minusDays(1);
+                    break;
+                case "7d":
+                    startDate = endDate.minusDays(7);
+                    break;
+                case "30d":
+                    startDate = endDate.minusDays(30);
+                    break;
+                case "custom":
+                    if (customStartDate != null && customEndDate != null) {
+                        startDate = customStartDate;
+                        endDate = customEndDate;
+                    }
+                    break;
+            }
+        }
         
         Pageable pageable = PageRequest.of(page, size);
         Page<ExceptionRecord> exceptions;
         
-        // Use the combined filter method for better performance and functionality
-        exceptions = exceptionRecordService.findWithFilters(projectName, exceptionType, environment, 
-                                                           componentName, startDate, endDate, pageable);
+        // Use the extended filter method with service and method
+        exceptions = exceptionRecordService.findWithAllFilters(projectName, exceptionType, environment, 
+                                                             componentName, serviceName, method,
+                                                             startDate, endDate, pageable);
+        
+        // Get distinct values for filter dropdowns
+        model.addAttribute("distinctProjects", exceptionRecordService.getDistinctProjects());
+        model.addAttribute("distinctExceptionTypes", exceptionRecordService.getDistinctExceptionTypes());
+        model.addAttribute("distinctEnvironments", exceptionRecordService.getDistinctEnvironments());
+        model.addAttribute("distinctComponents", exceptionRecordService.getDistinctComponents());
+        model.addAttribute("distinctServices", exceptionRecordService.getDistinctServices());
+        model.addAttribute("distinctMethods", exceptionRecordService.getDistinctMethods());
         
         model.addAttribute("exceptions", exceptions);
         model.addAttribute("currentPage", page);
@@ -90,6 +201,9 @@ public class ExceptionMonitorController {
         model.addAttribute("exceptionType", exceptionType);
         model.addAttribute("environment", environment);
         model.addAttribute("componentName", componentName);
+        model.addAttribute("serviceName", serviceName);
+        model.addAttribute("method", method);
+        model.addAttribute("selectedTimeRange", timeRange != null ? timeRange : "all");
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         model.addAttribute("applicationVersion", applicationVersion);
@@ -159,59 +273,140 @@ public class ExceptionMonitorController {
     }
     
     @GetMapping("/components")
-    public String components(Model model) {
-        // Component statistics
-        List<Object[]> componentStats = exceptionRecordService.getComponentStatistics();
+    public String components(
+            @RequestParam(required = false) String timeRange,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime customStartDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime customEndDate,
+            Model model) {
+        
+        // Calculate date range based on timeRange parameter
+        LocalDateTime startDate = calculateStartDate(timeRange, customStartDate, customEndDate);
+        LocalDateTime endDate = calculateEndDate(timeRange, customStartDate, customEndDate);
+        
+        // Component statistics (with time filtering)
+        List<Object[]> componentStats = exceptionRecordService.getComponentStatistics(startDate, endDate);
         model.addAttribute("componentStats", componentStats);
         
-        // Get component breakdown by pods
+        // Get component breakdown by pods (with time filtering)
         if (!componentStats.isEmpty()) {
             String topComponent = (String) componentStats.get(0)[0];
-            List<Object[]> componentPods = exceptionRecordService.getPodsByComponent(topComponent);
+            List<Object[]> componentPods = exceptionRecordService.getPodsByComponent(topComponent, startDate, endDate);
             model.addAttribute("componentPods", componentPods);
             model.addAttribute("selectedComponent", topComponent);
         }
         
+        // Time range attributes
+        model.addAttribute("selectedTimeRange", timeRange != null ? timeRange : "all");
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
         model.addAttribute("applicationVersion", applicationVersion);
         return "components";
     }
     
     @GetMapping("/projects")
-    public String projects(Model model) {
-        // Project statistics
-        List<Object[]> projectStats = exceptionRecordService.getProjectStatistics();
+    public String projects(
+            @RequestParam(required = false) String timeRange,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime customStartDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime customEndDate,
+            Model model) {
+        
+        // Calculate date range based on timeRange parameter
+        LocalDateTime startDate = calculateStartDate(timeRange, customStartDate, customEndDate);
+        LocalDateTime endDate = calculateEndDate(timeRange, customStartDate, customEndDate);
+        
+        // Project statistics (with time filtering)
+        List<Object[]> projectStats = exceptionRecordService.getProjectStatistics(startDate, endDate);
         model.addAttribute("projectStats", projectStats);
         
-        // Get projects by environment
+        // Get projects by environment (with time filtering)
         List<Object[]> projectsByEnv = new java.util.ArrayList<>();
         for (String env : new String[]{"UAT", "INT", "PROD"}) {
-            List<Object[]> envProjects = exceptionRecordService.getProjectsByEnvironment(env);
+            List<Object[]> envProjects = exceptionRecordService.getProjectsByEnvironment(env, startDate, endDate);
             if (!envProjects.isEmpty()) {
                 projectsByEnv.add(new Object[]{env, envProjects});
             }
         }
         model.addAttribute("projectsByEnvironment", projectsByEnv);
+        
+        // Time range attributes
+        model.addAttribute("selectedTimeRange", timeRange != null ? timeRange : "all");
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
         model.addAttribute("applicationVersion", applicationVersion);
         
         return "projects";
     }
     
     @GetMapping("/environments")
-    public String environments(Model model) {
-        // Environment statistics
-        List<Object[]> environmentStats = exceptionRecordService.getEnvironmentStatistics();
+    public String environments(
+            @RequestParam(required = false) String timeRange,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime customStartDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime customEndDate,
+            Model model) {
+        
+        // Calculate date range based on timeRange parameter
+        LocalDateTime startDate = calculateStartDate(timeRange, customStartDate, customEndDate);
+        LocalDateTime endDate = calculateEndDate(timeRange, customStartDate, customEndDate);
+        
+        // Environment statistics (with time filtering)
+        List<Object[]> environmentStats = exceptionRecordService.getEnvironmentStatistics(startDate, endDate);
         model.addAttribute("environmentStats", environmentStats);
         
-        // Get components by environment
+        // Get components by environment (with time filtering)
         List<Object[]> componentsByEnv = new java.util.ArrayList<>();
         for (Object[] envStat : environmentStats) {
             String env = (String) envStat[0];
-            List<Object[]> envComponents = exceptionRecordService.getComponentsByEnvironment(env);
+            List<Object[]> envComponents = exceptionRecordService.getComponentsByEnvironment(env, startDate, endDate);
             componentsByEnv.add(new Object[]{env, envComponents});
         }
         model.addAttribute("componentsByEnvironment", componentsByEnv);
+        
+        // Time range attributes
+        model.addAttribute("selectedTimeRange", timeRange != null ? timeRange : "all");
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
         model.addAttribute("applicationVersion", applicationVersion);
         
         return "environments";
+    }
+    
+    // Helper methods for date range calculation
+    private LocalDateTime calculateStartDate(String timeRange, LocalDateTime customStartDate, LocalDateTime customEndDate) {
+        LocalDateTime endDate = LocalDateTime.now();
+        
+        if (timeRange != null && !timeRange.isEmpty()) {
+            switch (timeRange) {
+                case "5m":
+                    return endDate.minusMinutes(5);
+                case "15m":
+                    return endDate.minusMinutes(15);
+                case "30m":
+                    return endDate.minusMinutes(30);
+                case "1h":
+                    return endDate.minusHours(1);
+                case "6h":
+                    return endDate.minusHours(6);
+                case "12h":
+                    return endDate.minusHours(12);
+                case "1d":
+                    return endDate.minusDays(1);
+                case "7d":
+                    return endDate.minusDays(7);
+                case "30d":
+                    return endDate.minusDays(30);
+                case "custom":
+                    return customStartDate;
+                default:
+                    return null;
+            }
+        }
+        return null;
+    }
+    
+    private LocalDateTime calculateEndDate(String timeRange, LocalDateTime customStartDate, LocalDateTime customEndDate) {
+        if (timeRange != null && timeRange.equals("custom")) {
+            return customEndDate;
+        }
+        return LocalDateTime.now();
     }
 }

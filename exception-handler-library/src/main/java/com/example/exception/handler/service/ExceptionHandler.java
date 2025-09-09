@@ -33,6 +33,11 @@ public class ExceptionHandler {
     }
     
     public void handle(Exception exception, Map<String, Object> additionalData) {
+        if (exception == null) {
+            log.warn("Null exception passed to handler, ignoring");
+            return;
+        }
+        
         try {
             ExceptionDto dto = createExceptionDto(exception, additionalData);
             
@@ -56,6 +61,11 @@ public class ExceptionHandler {
     }
     
     public void handleWithHttpHeaders(Exception exception, Map<String, Object> additionalData) {
+        if (exception == null) {
+            log.warn("Null exception passed to handler with HTTP headers, ignoring");
+            return;
+        }
+        
         try {
             // HTTP headers'ı otomatik olarak additional data'ya ekle
             Map<String, Object> enhancedData = enhanceWithHttpHeaders(additionalData);
@@ -78,31 +88,47 @@ public class ExceptionHandler {
     }
     
     private ExceptionDto createExceptionDto(Exception exception, Map<String, Object> additionalData) {
+        if (exception == null) {
+            throw new IllegalArgumentException("Exception cannot be null");
+        }
+        
         ExceptionDto dto = new ExceptionDto();
         dto.setId(UUID.randomUUID().toString());
         dto.setExceptionType(exception.getClass().getSimpleName());
-        dto.setMessage(exception.getMessage());
+        dto.setMessage(exception.getMessage() != null ? exception.getMessage() : "No message available");
         dto.setStackTrace(getStackTrace(exception));
         dto.setTimestamp(LocalDateTime.now());
         
         // Configuration'dan gelen değerler
-        dto.setProjectName(properties.getProjectName());
-        dto.setComponentName(properties.getComponentName());
-        dto.setPodName(properties.getPodName());
-        dto.setPodIp(properties.getPodIp());
-        dto.setClusterName(properties.getClusterName());
-        dto.setEnvironment(properties.getEnvironment());
+        if (properties != null) {
+            dto.setProjectName(properties.getProjectName());
+            dto.setComponentName(properties.getComponentName());
+            dto.setPodName(properties.getPodName());
+            dto.setPodIp(properties.getPodIp());
+            dto.setClusterName(properties.getClusterName());
+            dto.setEnvironment(properties.getEnvironment());
+        }
         
         // HTTP request bilgileri (varsa)
         try {
             ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-            HttpServletRequest request = attr.getRequest();
-            
-            dto.setServiceName(request.getServletPath());
-            dto.setMethod(request.getMethod());
-            dto.setUrl(request.getRequestURL().toString());
-            dto.setUserAgent(request.getHeader("User-Agent"));
-            dto.setSessionId(request.getSession().getId());
+            if (attr != null) {
+                HttpServletRequest request = attr.getRequest();
+                if (request != null) {
+                    dto.setServiceName(request.getServletPath());
+                    dto.setMethod(request.getMethod());
+                    
+                    if (request.getRequestURL() != null) {
+                        dto.setUrl(request.getRequestURL().toString());
+                    }
+                    
+                    dto.setUserAgent(request.getHeader("User-Agent"));
+                    
+                    if (request.getSession(false) != null) {
+                        dto.setSessionId(request.getSession(false).getId());
+                    }
+                }
+            }
             
         } catch (IllegalStateException e) {
             // Request context yok, web dışı bir ortam
@@ -119,7 +145,16 @@ public class ExceptionHandler {
         
         try {
             ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            if (attr == null) {
+                log.debug("No request attributes available");
+                return enhancedData;
+            }
+            
             HttpServletRequest request = attr.getRequest();
+            if (request == null) {
+                log.debug("No HTTP request available");
+                return enhancedData;
+            }
             
             // HTTP Headers'ı additional data'ya ekle
             Map<String, Object> httpHeaders = new HashMap<>();
@@ -151,13 +186,17 @@ public class ExceptionHandler {
             enhancedData.put("httpHeaders", httpHeaders);
             
             // Request parametreleri
-            if (!request.getParameterMap().isEmpty()) {
+            if (request.getParameterMap() != null && !request.getParameterMap().isEmpty()) {
                 enhancedData.put("requestParameters", new HashMap<>(request.getParameterMap()));
             }
             
             // Remote address bilgileri
-            enhancedData.put("remoteAddress", request.getRemoteAddr());
-            enhancedData.put("remoteHost", request.getRemoteHost());
+            if (request.getRemoteAddr() != null) {
+                enhancedData.put("remoteAddress", request.getRemoteAddr());
+            }
+            if (request.getRemoteHost() != null) {
+                enhancedData.put("remoteHost", request.getRemoteHost());
+            }
             enhancedData.put("remotePort", request.getRemotePort());
             
         } catch (IllegalStateException e) {
@@ -169,6 +208,10 @@ public class ExceptionHandler {
     }
     
     private void addHeaderIfPresent(Map<String, Object> headers, HttpServletRequest request, String headerName) {
+        if (headers == null || request == null || headerName == null) {
+            return;
+        }
+        
         String headerValue = request.getHeader(headerName);
         if (headerValue != null && !headerValue.trim().isEmpty()) {
             // Authorization header'ı güvenlik için mask'le
@@ -181,9 +224,18 @@ public class ExceptionHandler {
     }
     
     private String getStackTrace(Exception exception) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        exception.printStackTrace(pw);
-        return sw.toString();
+        if (exception == null) {
+            return "No stack trace available - exception was null";
+        }
+        
+        try {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            exception.printStackTrace(pw);
+            return sw.toString();
+        } catch (Exception e) {
+            log.error("Error getting stack trace", e);
+            return "Error retrieving stack trace: " + e.getMessage();
+        }
     }
 }

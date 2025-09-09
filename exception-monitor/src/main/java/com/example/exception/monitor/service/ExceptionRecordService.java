@@ -108,4 +108,107 @@ public class ExceptionRecordService {
     public List<Object[]> getProjectsByEnvironment(String environment) {
         return repository.getProjectsByEnvironment(environment);
     }
+    
+    // Distinct values for filters
+    public List<String> getDistinctProjects() {
+        return repository.findDistinctProjectNames();
+    }
+    
+    public List<String> getDistinctExceptionTypes() {
+        return repository.findDistinctExceptionTypes();
+    }
+    
+    public List<String> getDistinctEnvironments() {
+        return repository.findDistinctEnvironments();
+    }
+    
+    public List<String> getDistinctComponents() {
+        return repository.findDistinctComponentNames();
+    }
+    
+    public List<String> getDistinctServices() {
+        return repository.findDistinctServiceNames();
+    }
+    
+    public List<String> getDistinctMethods() {
+        return repository.findDistinctMethods();
+    }
+    
+    // Time range based exception count
+    public Long getExceptionsByTimeRange(LocalDateTime startDate, LocalDateTime endDate) {
+        if (startDate == null || endDate == null) {
+            return 0L;
+        }
+        return repository.countByTimestampBetween(startDate, endDate);
+    }
+    
+    // Filtered search with service and method
+    public Page<ExceptionRecord> findWithAllFilters(String projectName, String exceptionType, 
+                                                   String environment, String componentName,
+                                                   String serviceName, String method,
+                                                   LocalDateTime startDate, LocalDateTime endDate, 
+                                                   Pageable pageable) {
+        
+        String normalizedProjectName = (projectName != null && projectName.trim().isEmpty()) ? null : projectName;
+        String normalizedExceptionType = (exceptionType != null && exceptionType.trim().isEmpty()) ? null : exceptionType;
+        String normalizedEnvironment = (environment != null && environment.trim().isEmpty()) ? null : environment;
+        String normalizedComponentName = (componentName != null && componentName.trim().isEmpty()) ? null : componentName;
+        String normalizedServiceName = (serviceName != null && serviceName.trim().isEmpty()) ? null : serviceName;
+        String normalizedMethod = (method != null && method.trim().isEmpty()) ? null : method;
+        
+        return repository.findWithAllFilters(normalizedProjectName, normalizedExceptionType, 
+                                           normalizedEnvironment, normalizedComponentName,
+                                           normalizedServiceName, normalizedMethod,
+                                           startDate, endDate, pageable);
+    }
+    
+    // Time-filtered statistics methods
+    public List<Object[]> getExceptionTypeStatistics(LocalDateTime startDate, LocalDateTime endDate) {
+        if (startDate != null || endDate != null) {
+            return repository.getExceptionTypeStatisticsByTimeRange(startDate, endDate);
+        }
+        return repository.getExceptionTypeStatistics();
+    }
+    
+    public List<Object[]> getProjectStatistics(LocalDateTime startDate, LocalDateTime endDate) {
+        if (startDate != null || endDate != null) {
+            return repository.getProjectStatisticsByTimeRange(startDate, endDate);
+        }
+        return repository.getProjectStatistics();
+    }
+    
+    public List<Object[]> getComponentStatistics(LocalDateTime startDate, LocalDateTime endDate) {
+        if (startDate != null || endDate != null) {
+            return repository.getComponentStatisticsByTimeRange(startDate, endDate);
+        }
+        return repository.getComponentStatistics();
+    }
+    
+    public List<Object[]> getEnvironmentStatistics(LocalDateTime startDate, LocalDateTime endDate) {
+        if (startDate != null || endDate != null) {
+            return repository.getEnvironmentStatisticsByTimeRange(startDate, endDate);
+        }
+        return repository.getEnvironmentStatistics();
+    }
+    
+    public List<Object[]> getComponentsByEnvironment(String environment, LocalDateTime startDate, LocalDateTime endDate) {
+        if (startDate != null || endDate != null) {
+            return repository.getComponentsByEnvironmentAndTimeRange(environment, startDate, endDate);
+        }
+        return repository.getComponentsByEnvironment(environment);
+    }
+    
+    public List<Object[]> getPodsByComponent(String componentName, LocalDateTime startDate, LocalDateTime endDate) {
+        if (startDate != null || endDate != null) {
+            return repository.getPodsByComponentAndTimeRange(componentName, startDate, endDate);
+        }
+        return repository.getPodsByComponent(componentName);
+    }
+    
+    public List<Object[]> getProjectsByEnvironment(String environment, LocalDateTime startDate, LocalDateTime endDate) {
+        if (startDate != null || endDate != null) {
+            return repository.getProjectsByEnvironmentAndTimeRange(environment, startDate, endDate);
+        }
+        return repository.getProjectsByEnvironment(environment);
+    }
 }
