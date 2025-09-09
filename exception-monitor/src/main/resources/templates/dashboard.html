@@ -12,6 +12,7 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
                 <i class="fas fa-bug"></i> Exception Monitor
+                <span class="badge bg-secondary ms-2" th:text="'v' + ${applicationVersion}">v1.0.0</span>
             </a>
             <div class="navbar-nav">
                 <a class="nav-link active" href="/">Dashboard</a>
@@ -232,6 +233,7 @@
                                         <th>Exception Type</th>
                                         <th>Message</th>
                                         <th>Project</th>
+                                        <th>Service</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -249,6 +251,9 @@
                                             Exception message...
                                         </td>
                                         <td th:text="${exception.projectName}">ProjectName</td>
+                                        <td>
+                                            <span class="badge bg-info" th:text="${exception.serviceName}">ServiceName</span>
+                                        </td>
                                         <td>
                                             <a th:href="@{/exceptions/{id}(id=${exception.id})}" 
                                                class="btn btn-sm btn-outline-info">

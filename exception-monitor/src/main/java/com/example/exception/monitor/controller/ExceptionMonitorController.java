@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +29,14 @@ public class ExceptionMonitorController {
     private final ExceptionRecordService exceptionRecordService;
     private final ObjectMapper objectMapper;
     
+    @Value("${spring.application.version:1.0.0}")
+    private String applicationVersion;
+    
     @GetMapping("/")
     public String dashboard(Model model) {
+        // Application version
+        model.addAttribute("applicationVersion", applicationVersion);
+        
         // Dashboard statistics
         model.addAttribute("totalExceptions", exceptionRecordService.getTotalExceptions());
         model.addAttribute("exceptionsLast24h", exceptionRecordService.getExceptionsInLast24Hours());
@@ -85,6 +92,7 @@ public class ExceptionMonitorController {
         model.addAttribute("componentName", componentName);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
+        model.addAttribute("applicationVersion", applicationVersion);
         
         return "exceptions";
     }
@@ -136,6 +144,7 @@ public class ExceptionMonitorController {
                 model.addAttribute("additionalDataParseError", true);
             }
             
+            model.addAttribute("applicationVersion", applicationVersion);
             return "exception-detail";
         } else {
             return "redirect:/exceptions";
@@ -163,6 +172,7 @@ public class ExceptionMonitorController {
             model.addAttribute("selectedComponent", topComponent);
         }
         
+        model.addAttribute("applicationVersion", applicationVersion);
         return "components";
     }
     
@@ -181,6 +191,7 @@ public class ExceptionMonitorController {
             }
         }
         model.addAttribute("projectsByEnvironment", projectsByEnv);
+        model.addAttribute("applicationVersion", applicationVersion);
         
         return "projects";
     }
@@ -199,6 +210,7 @@ public class ExceptionMonitorController {
             componentsByEnv.add(new Object[]{env, envComponents});
         }
         model.addAttribute("componentsByEnvironment", componentsByEnv);
+        model.addAttribute("applicationVersion", applicationVersion);
         
         return "environments";
     }
