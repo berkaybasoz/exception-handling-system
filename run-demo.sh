@@ -46,7 +46,7 @@ cd ../demo-app
 nohup ./gradlew bootRun > demo.log 2>&1 &
 DEMO_PID=$!
 echo "✅ Demo Application started (PID: $DEMO_PID)"
-echo "   API: http://localhost:8081"
+echo "   API: http://localhost:8092"
 echo "   Logs: tail -f demo-app/demo.log"
 
 echo ""
@@ -58,22 +58,22 @@ echo "5. Testing Exception Generation..."
 
 # Test various exception types
 echo "   - Testing RuntimeException..."
-curl -s "http://localhost:8081/api/throw-exception?type=runtime" > /dev/null
+curl -s "http://localhost:8092/api/throw-exception?type=runtime" > /dev/null
 
 echo "   - Testing IllegalArgumentException..."
-curl -s "http://localhost:8081/api/throw-exception?type=illegal-argument" > /dev/null
+curl -s "http://localhost:8092/api/throw-exception?type=illegal-argument" > /dev/null
 
 echo "   - Testing NullPointerException..."
-curl -s "http://localhost:8081/api/throw-exception?type=null-pointer" > /dev/null
+curl -s "http://localhost:8092/api/throw-exception?type=null-pointer" > /dev/null
 
 echo "   - Testing Validation Error..."
-curl -s "http://localhost:8081/api/validation-error?email=invalid-email" > /dev/null
+curl -s "http://localhost:8092/api/validation-error?email=invalid-email" > /dev/null
 
 echo "   - Testing Database Error..."
-curl -s "http://localhost:8081/api/database-error" > /dev/null
+curl -s "http://localhost:8092/api/database-error" > /dev/null
 
 echo "   - Testing User Processing Error..."
-curl -s -X POST "http://localhost:8081/api/user/999" \
+curl -s -X POST "http://localhost:8092/api/user/999" \
   -H "Content-Type: application/json" \
   -d '{"name": "Test User"}' > /dev/null
 
@@ -83,7 +83,7 @@ echo ""
 echo "🔗 URLs:"
 echo "   • Exception Monitor Dashboard: http://localhost:8080"
 echo "   • Exception List: http://localhost:8080/exceptions"
-echo "   • Demo API Docs: http://localhost:8081/api/hello"
+echo "   • Demo API Docs: http://localhost:8092/api/hello"
 echo "   • Kafka UI: http://localhost:8090"
 echo "   • H2 Console: http://localhost:8080/h2-console (JDBC URL: jdbc:h2:mem:exceptiondb)"
 echo ""

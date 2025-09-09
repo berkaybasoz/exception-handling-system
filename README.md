@@ -43,7 +43,7 @@ Web arayüzü: http://localhost:8080
 cd demo-app
 ./gradlew bootRun
 ```
-API: http://localhost:8081
+API: http://localhost:8092
 
 ## Konfigürasyon
 
@@ -67,22 +67,22 @@ exception:
 
 1. **Basit Exception Test**
 ```bash
-curl "http://localhost:8081/api/throw-exception?type=runtime"
+curl "http://localhost:8092/api/throw-exception?type=runtime"
 ```
 
 2. **Validation Error Test**
 ```bash
-curl "http://localhost:8081/api/validation-error?email=invalid-email"
+curl "http://localhost:8092/api/validation-error?email=invalid-email"
 ```
 
 3. **Database Error Test**
 ```bash
-curl "http://localhost:8081/api/database-error"
+curl "http://localhost:8092/api/database-error"
 ```
 
 4. **User Processing Error Test**
 ```bash
-curl -X POST "http://localhost:8081/api/user/999" \
+curl -X POST "http://localhost:8092/api/user/999" \
   -H "Content-Type: application/json" \
   -d '{"name": "Test User"}'
 ```

@@ -27,11 +27,11 @@
         {
           "name": "exception-handler-library-1.0.0.jar",
           "url": "exception-handler-library-1.0.0.jar",
-          "size": 13598,
-          "sha512": "0897363f2113e968f8f67c5049225379367e4f8479ed1fa308d747fa62103450551c4aaec0a95a46b7097d06b486be6e121eec79825675e118a327ec55836337",
-          "sha256": "649733be72a52d3759244334f2e7112feef3b2255dcf26fb844d263dd1a22a7e",
-          "sha1": "f56542f1f3f0b6c97320af85376a2762dd2cff48",
-          "md5": "4e72cc1290ceea2c0b2e79104e47a4ab"
+          "size": 13660,
+          "sha512": "cf7310081ce5d33db131bccd95f8a7e50ff41ccb2f3b0bd5f1c91f10f737b862b2c48b8d8b42f2ce2d0a90ae1c3ec647e918d3909bd5d4cbd9b1a8691014448c",
+          "sha256": "40bcb87849774bf16da52e542b2036f2d76f77c0baf4e8d9e01d5aeb6dc7bbb6",
+          "sha1": "732a673ae7e2b605f8f827ce730d998da0b35e66",
+          "md5": "b4e874edd30b81ccf3ce633e9f45dbce"
         }
       ]
     },
@@ -74,6 +74,13 @@
           }
         },
         {
+          "group": "com.fasterxml.jackson.datatype",
+          "module": "jackson-datatype-jsr310",
+          "version": {
+            "requires": "2.15.3"
+          }
+        },
+        {
           "group": "org.springframework.boot",
           "module": "spring-boot-configuration-processor",
           "version": {
@@ -85,11 +92,11 @@
         {
           "name": "exception-handler-library-1.0.0.jar",
           "url": "exception-handler-library-1.0.0.jar",
-          "size": 13598,
-          "sha512": "0897363f2113e968f8f67c5049225379367e4f8479ed1fa308d747fa62103450551c4aaec0a95a46b7097d06b486be6e121eec79825675e118a327ec55836337",
-          "sha256": "649733be72a52d3759244334f2e7112feef3b2255dcf26fb844d263dd1a22a7e",
-          "sha1": "f56542f1f3f0b6c97320af85376a2762dd2cff48",
-          "md5": "4e72cc1290ceea2c0b2e79104e47a4ab"
+          "size": 13660,
+          "sha512": "cf7310081ce5d33db131bccd95f8a7e50ff41ccb2f3b0bd5f1c91f10f737b862b2c48b8d8b42f2ce2d0a90ae1c3ec647e918d3909bd5d4cbd9b1a8691014448c",
+          "sha256": "40bcb87849774bf16da52e542b2036f2d76f77c0baf4e8d9e01d5aeb6dc7bbb6",
+          "sha1": "732a673ae7e2b605f8f827ce730d998da0b35e66",
+          "md5": "b4e874edd30b81ccf3ce633e9f45dbce"
         }
       ]
     }
