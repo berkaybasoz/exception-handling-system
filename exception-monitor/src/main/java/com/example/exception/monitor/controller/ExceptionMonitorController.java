@@ -5,6 +5,7 @@ import com.example.exception.monitor.service.ExceptionRecordService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class ExceptionMonitorController {
@@ -91,18 +93,25 @@ public class ExceptionMonitorController {
             
             // Additional data'yı parse et
             try {
+                log.info("Processing exception detail for ID: {}", id);
+                log.info("Additional data: {}", record.getAdditionalData());
+                
                 if (record.getAdditionalData() != null && !record.getAdditionalData().trim().isEmpty()) {
                     JsonNode additionalDataJson = objectMapper.readTree(record.getAdditionalData());
                     model.addAttribute("additionalDataJson", additionalDataJson);
                     
                     // HTTP headers'ı ayrı olarak ekle
                     if (additionalDataJson.has("httpHeaders")) {
-                        model.addAttribute("httpHeaders", additionalDataJson.get("httpHeaders"));
+                        JsonNode httpHeaders = additionalDataJson.get("httpHeaders");
+                        log.info("Found HTTP headers: {}", httpHeaders);
+                        model.addAttribute("httpHeaders", httpHeaders);
                     }
                     
                     // Request parameters'ı ayrı olarak ekle
                     if (additionalDataJson.has("requestParameters")) {
-                        model.addAttribute("requestParameters", additionalDataJson.get("requestParameters"));
+                        JsonNode requestParams = additionalDataJson.get("requestParameters");
+                        log.info("Found request parameters: {}", requestParams);
+                        model.addAttribute("requestParameters", requestParams);
                     }
                     
                     // Remote info'yu ayrı olarak ekle
@@ -117,7 +126,7 @@ public class ExceptionMonitorController {
                     }
                 }
             } catch (Exception e) {
-                // JSON parse hatası durumunda raw data'yı göster
+                log.error("Error parsing additional data for exception {}: {}", id, e.getMessage());
                 model.addAttribute("additionalDataParseError", true);
             }
             
@@ -125,5 +134,12 @@ public class ExceptionMonitorController {
         } else {
             return "redirect:/exceptions";
         }
+    }
+    
+    @GetMapping("/api/exceptions/{id}")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public ExceptionRecord getExceptionJson(@PathVariable String id) {
+        Optional<ExceptionRecord> exception = exceptionRecordService.findById(id);
+        return exception.orElse(null);
     }
 }

@@ -4,6 +4,7 @@ server:
 spring:
   application:
     name: exception-monitor
+    version: 2.1.0
     
   datasource:
     url: jdbc:h2:mem:exceptiondb

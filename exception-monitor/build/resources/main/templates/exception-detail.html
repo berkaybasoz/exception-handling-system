@@ -26,6 +26,7 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
                 <i class="fas fa-bug"></i> Exception Monitor
+                <small class="text-muted ms-2">v2.1.0</small>
             </a>
             <div class="navbar-nav">
                 <a class="nav-link" href="/">Dashboard</a>
@@ -117,7 +118,7 @@
                             <br>
                             <small class="text-muted" th:text="${exception.userAgent}">Mozilla/5.0...</small>
                         </div>
-                        <div th:unless="${exception.sessionId and exception.userAgent}" class="text-muted">
+                        <div th:unless="${exception.sessionId != null and exception.userAgent != null}" class="text-muted">
                             No session information available
                         </div>
                     </div>
@@ -129,7 +130,7 @@
                         <h6><i class="fas fa-network-wired"></i> Remote Connection Info</h6>
                     </div>
                     <div class="card-body">
-                        <div th:if="${remoteAddress or remoteHost or remotePort}">
+                        <div th:if="${remoteAddress != null or remoteHost != null or remotePort != null}">
                             <div th:if="${remoteAddress}">
                                 <strong>Remote Address:</strong> <code th:text="${remoteAddress}">192.168.1.100</code>
                             </div>
@@ -140,7 +141,7 @@
                                 <strong>Remote Port:</strong> <code th:text="${remotePort}">12345</code>
                             </div>
                         </div>
-                        <div th:unless="${remoteAddress or remoteHost or remotePort}" class="text-muted">
+                        <div th:unless="${remoteAddress != null or remoteHost != null or remotePort != null}" class="text-muted">
                             No remote connection information available
                         </div>
                     </div>
@@ -149,8 +150,8 @@
         </div>
         
         <!-- HTTP Headers and Request Parameters -->
-        <div class="row mt-4" th:if="${httpHeaders or requestParameters}">
-            <div class="col-md-6" th:if="${httpHeaders}">
+        <div class="row mt-4" th:if="${httpHeaders != null or requestParameters != null}">
+            <div class="col-md-6" th:if="${httpHeaders != null}">
                 <div class="card">
                     <div class="card-header">
                         <h6><i class="fas fa-list"></i> HTTP Headers</h6>
@@ -175,7 +176,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6" th:if="${requestParameters}">
+            <div class="col-md-6" th:if="${requestParameters != null}">
                 <div class="card">
                     <div class="card-header">
                         <h6><i class="fas fa-cog"></i> Request Parameters</h6>
@@ -215,7 +216,7 @@
                                 <strong>Warning:</strong> Could not parse additional data as JSON. Showing raw data:
                                 <pre class="bg-light p-2 rounded mt-2" th:text="${exception.additionalData}">Raw data</pre>
                             </div>
-                            <div th:unless="${additionalDataParseError and additionalDataJson}">
+                            <div th:unless="${additionalDataParseError}" th:if="${additionalDataJson}">
                                 <div class="table-responsive">
                                     <table class="table table-sm table-striped">
                                         <thead class="table-dark">

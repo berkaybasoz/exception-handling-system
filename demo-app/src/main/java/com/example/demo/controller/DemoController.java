@@ -27,6 +27,8 @@ public class DemoController {
     @GetMapping("/config")
     public ResponseEntity<Map<String, Object>> getConfig() {
         Map<String, Object> config = new HashMap<>();
+        config.put("applicationName", "demo-app");
+        config.put("version", "1.2.0");
         config.put("projectName", properties.getProjectName());
         config.put("podName", properties.getPodName());
         config.put("podIp", properties.getPodIp());
