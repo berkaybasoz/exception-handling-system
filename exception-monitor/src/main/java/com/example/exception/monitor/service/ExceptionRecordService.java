@@ -65,4 +65,24 @@ public class ExceptionRecordService {
         LocalDateTime since = LocalDateTime.now().minusHours(1);
         return repository.countExceptionsSince(since);
     }
+    
+    public List<Object[]> getComponentStatistics() {
+        return repository.getComponentStatistics();
+    }
+    
+    public List<Object[]> getEnvironmentStatistics() {
+        return repository.getEnvironmentStatistics();
+    }
+    
+    public List<Object[]> getComponentsByEnvironment(String environment) {
+        return repository.getComponentsByEnvironment(environment);
+    }
+    
+    public List<Object[]> getPodsByComponent(String componentName) {
+        return repository.getPodsByComponent(componentName);
+    }
+    
+    public List<Object[]> getProjectsByEnvironment(String environment) {
+        return repository.getProjectsByEnvironment(environment);
+    }
 }

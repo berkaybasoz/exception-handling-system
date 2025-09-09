@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "exception.handler")
 public class ExceptionHandlerProperties {
     private String projectName;
+    private String componentName;
     private String podName;
     private String podIp;
     private String clusterName;

@@ -32,6 +32,9 @@ public class ExceptionRecord {
     @Column(name = "project_name")
     private String projectName;
     
+    @Column(name = "component_name")
+    private String componentName;
+    
     @Column(name = "pod_name")
     private String podName;
     

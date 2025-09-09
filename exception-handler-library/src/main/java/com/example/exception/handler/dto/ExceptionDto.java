@@ -17,6 +17,7 @@ public class ExceptionDto {
     private String stackTrace;
     private LocalDateTime timestamp;
     private String projectName;
+    private String componentName;
     private String podName;
     private String podIp;
     private String clusterName;

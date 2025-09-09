@@ -57,6 +57,7 @@ public class KafkaConsumerService {
         }
         
         record.setProjectName(getStringValue(jsonNode, "projectName"));
+        record.setComponentName(getStringValue(jsonNode, "componentName"));
         record.setPodName(getStringValue(jsonNode, "podName"));
         record.setPodIp(getStringValue(jsonNode, "podIp"));
         record.setClusterName(getStringValue(jsonNode, "clusterName"));

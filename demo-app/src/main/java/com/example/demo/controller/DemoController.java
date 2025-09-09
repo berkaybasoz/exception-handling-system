@@ -30,6 +30,7 @@ public class DemoController {
         config.put("applicationName", "demo-app");
         config.put("version", "1.2.0");
         config.put("projectName", properties.getProjectName());
+        config.put("componentName", properties.getComponentName());
         config.put("podName", properties.getPodName());
         config.put("podIp", properties.getPodIp());
         config.put("clusterName", properties.getClusterName());

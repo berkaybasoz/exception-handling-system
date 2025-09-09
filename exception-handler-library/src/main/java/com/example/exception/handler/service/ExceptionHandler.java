@@ -87,6 +87,7 @@ public class ExceptionHandler {
         
         // Configuration'dan gelen değerler
         dto.setProjectName(properties.getProjectName());
+        dto.setComponentName(properties.getComponentName());
         dto.setPodName(properties.getPodName());
         dto.setPodIp(properties.getPodIp());
         dto.setClusterName(properties.getClusterName());

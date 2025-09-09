@@ -31,7 +31,10 @@
             <div class="navbar-nav">
                 <a class="nav-link" href="/">Dashboard</a>
                 <a class="nav-link" href="/exceptions">Exceptions</a>
-                <span class="nav-link active">Exception Detail</span>
+                <a class="nav-link" href="/components">Components</a>
+                <a class="nav-link" href="/projects">Projects</a>
+                <a class="nav-link" href="/environments">Environments</a>
+                <span class="nav-link active">Detail</span>
             </div>
         </div>
     </nav>
@@ -70,6 +73,7 @@
                         <h6><i class="fas fa-info-circle"></i> System Information</h6>
                         <div class="mb-3">
                             <span class="badge bg-primary info-badge" th:if="${exception.projectName}" th:text="'Project: ' + ${exception.projectName}">Project: ProjectName</span>
+                            <span class="badge bg-dark info-badge" th:if="${exception.componentName}" th:text="'Component: ' + ${exception.componentName}">Component: ComponentName</span>
                             <span class="badge bg-secondary info-badge" th:if="${exception.podName}" th:text="'Pod: ' + ${exception.podName}">Pod: PodName</span>
                             <span class="badge bg-info info-badge" th:if="${exception.podIp}" th:text="'IP: ' + ${exception.podIp}">IP: 192.168.1.100</span>
                             <span class="badge bg-success info-badge" th:if="${exception.clusterName}" th:text="'Cluster: ' + ${exception.clusterName}">Cluster: ClusterName</span>

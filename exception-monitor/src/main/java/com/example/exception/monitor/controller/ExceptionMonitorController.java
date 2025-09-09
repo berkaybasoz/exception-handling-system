@@ -43,6 +43,14 @@ public class ExceptionMonitorController {
         List<Object[]> projectStats = exceptionRecordService.getProjectStatistics();
         model.addAttribute("projectStats", projectStats);
         
+        // Component statistics
+        List<Object[]> componentStats = exceptionRecordService.getComponentStatistics();
+        model.addAttribute("componentStats", componentStats);
+        
+        // Environment statistics
+        List<Object[]> environmentStats = exceptionRecordService.getEnvironmentStatistics();
+        model.addAttribute("environmentStats", environmentStats);
+        
         // Recent exceptions
         Page<ExceptionRecord> recentExceptions = exceptionRecordService.findAll(PageRequest.of(0, 10));
         model.addAttribute("recentExceptions", recentExceptions.getContent());
@@ -141,5 +149,59 @@ public class ExceptionMonitorController {
     public ExceptionRecord getExceptionJson(@PathVariable String id) {
         Optional<ExceptionRecord> exception = exceptionRecordService.findById(id);
         return exception.orElse(null);
+    }
+    
+    @GetMapping("/components")
+    public String components(Model model) {
+        // Component statistics
+        List<Object[]> componentStats = exceptionRecordService.getComponentStatistics();
+        model.addAttribute("componentStats", componentStats);
+        
+        // Get component breakdown by pods
+        if (!componentStats.isEmpty()) {
+            String topComponent = (String) componentStats.get(0)[0];
+            List<Object[]> componentPods = exceptionRecordService.getPodsByComponent(topComponent);
+            model.addAttribute("componentPods", componentPods);
+            model.addAttribute("selectedComponent", topComponent);
+        }
+        
+        return "components";
+    }
+    
+    @GetMapping("/projects")
+    public String projects(Model model) {
+        // Project statistics
+        List<Object[]> projectStats = exceptionRecordService.getProjectStatistics();
+        model.addAttribute("projectStats", projectStats);
+        
+        // Get projects by environment
+        List<Object[]> projectsByEnv = new java.util.ArrayList<>();
+        for (String env : new String[]{"UAT", "INT", "PROD"}) {
+            List<Object[]> envProjects = exceptionRecordService.getProjectsByEnvironment(env);
+            if (!envProjects.isEmpty()) {
+                projectsByEnv.add(new Object[]{env, envProjects});
+            }
+        }
+        model.addAttribute("projectsByEnvironment", projectsByEnv);
+        
+        return "projects";
+    }
+    
+    @GetMapping("/environments")
+    public String environments(Model model) {
+        // Environment statistics
+        List<Object[]> environmentStats = exceptionRecordService.getEnvironmentStatistics();
+        model.addAttribute("environmentStats", environmentStats);
+        
+        // Get components by environment
+        List<Object[]> componentsByEnv = new java.util.ArrayList<>();
+        for (Object[] envStat : environmentStats) {
+            String env = (String) envStat[0];
+            List<Object[]> envComponents = exceptionRecordService.getComponentsByEnvironment(env);
+            componentsByEnv.add(new Object[]{env, envComponents});
+        }
+        model.addAttribute("componentsByEnvironment", componentsByEnv);
+        
+        return "environments";
     }
 }
