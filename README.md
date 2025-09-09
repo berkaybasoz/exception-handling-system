@@ -1,172 +1,352 @@
-# Spring Boot Exception Handling System
+# 🚀 Spring Boot Exception Handling System
 
-Bu proje, Spring Boot uygulamaları için kapsamlı bir exception handling ve monitoring sistemi sunar. Sistem üç ana bileşenden oluşur:
+A comprehensive exception handling and monitoring system for Spring Boot applications. The system consists of three main components working together to provide robust error tracking and analysis capabilities.
 
-## Bileşenler
+![Dashboard Overview](images/dashboard.png)
+
+## 📋 Table of Contents
+
+- [System Components](#-system-components)
+- [Quick Start](#-quick-start)
+- [Features](#-features)
+- [Monitoring Interface](#-monitoring-interface)
+- [Configuration](#-configuration)
+- [API Endpoints](#-api-endpoints)
+- [Library Usage](#-library-usage)
+- [Development](#-development)
+
+## 🏗️ System Components
 
 ### 1. Exception Handler Library
-- Spring Boot uygulamalarına entegre edilebilen bir library
-- Exception'ları yakalar, Kafka'ya gönderir ve loglara yazar
-- Otomatik konfigürasyon desteği
+- **Purpose**: Reusable library for Spring Boot applications
+- **Features**: Captures exceptions, sends to Kafka, writes logs
+- **Integration**: Auto-configuration support with Spring Boot
+- **HTTP Headers**: Automatically captures HTTP request information
 
 ### 2. Exception Monitor Microservice
-- Kafka'dan exception verilerini consume eder
-- Veritabanına kaydeder
-- Web tabanlı monitoring arayüzü sunar
+- **Purpose**: Central monitoring and analysis service
+- **Features**: Consumes Kafka messages, stores in database
+- **Interface**: Web-based monitoring dashboard
+- **Database**: H2 in-memory (development) / PostgreSQL (production)
 
 ### 3. Demo Application
-- Library'nin kullanımını gösteren örnek uygulama
-- Çeşitli exception tiplerini test etmek için endpoint'ler
+- **Purpose**: Example implementation showing library usage
+- **Features**: Various exception types for testing
+- **Port**: 8092 (configurable)
+- **Endpoints**: Multiple test scenarios available
 
-## Kurulum ve Çalıştırma
+## 🚀 Quick Start
 
-### Önkoşullar
-- Java 17+
-- Gradle 7+
-- Kafka (localhost:9092)
+### Prerequisites
+- ☕ Java 17+
+- 🛠️ Gradle 7+
+- 📡 Apache Kafka (localhost:9092)
+- 🐳 Docker Compose (optional)
 
-### 1. Library'yi Build Et
+### Option 1: Docker Compose (Recommended)
 ```bash
-cd exception-handler-library
-./gradlew publishToMavenLocal
+# Start Kafka and Zookeeper
+docker-compose up -d
+
+# Build and run services with your IDE or command line
 ```
 
-### 2. Exception Monitor'ü Çalıştır
+### Option 2: Manual Setup
+
+1. **Build the Library**
 ```bash
-cd exception-monitor
-./gradlew bootRun
+./gradlew :exception-handler-library:publishToMavenLocal
 ```
-Web arayüzü: http://localhost:8080
 
-### 3. Demo App'i Çalıştır
+2. **Start Exception Monitor**
 ```bash
-cd demo-app
-./gradlew bootRun
+./gradlew :exception-monitor:bootRun
 ```
-API: http://localhost:8092
+🌐 Web Interface: http://localhost:8080
 
-## Konfigürasyon
+3. **Start Demo Application**
+```bash
+./gradlew :demo-app:bootRun
+```
+🔗 API: http://localhost:8092
 
-Demo uygulamasında `bootstrap.yml` ile aşağıdaki parametreler ayarlanabilir:
+## ✨ Features
 
+- ✅ **Automatic HTTP Header Capture**: Captures request headers, parameters, and remote connection info
+- ✅ **Component-Based Tracking**: Track exceptions by project, component, pod, and environment
+- ✅ **Real-time Monitoring**: Live dashboard with statistics and filtering
+- ✅ **Multi-Environment Support**: UAT, INT, PROD environment configurations
+- ✅ **Request Parameter Tracking**: Automatically captures URL parameters
+- ✅ **Security**: Sensitive headers (Authorization) are automatically masked
+- ✅ **Responsive Design**: Modern Bootstrap 5 UI works on all devices
+- ✅ **Detailed Exception View**: Stack traces, system info, and HTTP context
+
+## 🖥️ Monitoring Interface
+
+The Exception Monitor provides comprehensive web-based monitoring with multiple specialized views:
+
+### Dashboard Overview
+![Dashboard](images/dashboard.png)
+- **Real-time Statistics**: Total exceptions, 24h trends, hourly counts
+- **Quick Navigation**: Access to all major sections
+- **Recent Activity**: Latest exceptions with direct access to details
+
+### Exception Management
+![Exceptions List](images/exceptions.png)
+- **Advanced Filtering**: Filter by project, type, date range
+- **Pagination**: Handle large exception datasets efficiently
+- **Exception Details**: Click-through to detailed exception analysis
+
+### Component Analysis
+![Components View](images/component.png)
+- **Component Statistics**: Exception counts by application component
+- **Pod Information**: Detailed pod-level exception tracking
+- **Performance Insights**: Identify problematic components quickly
+
+### Project Management
+![Projects View](images/project.png)
+- **Project Overview**: Exception counts across all projects
+- **Environment Breakdown**: Projects grouped by deployment environment
+- **Quick Actions**: Direct links to project-specific exception lists
+
+### Environment Monitoring
+![Environments View](images/environment.png)
+- **Environment Health**: Visual cards showing exception counts per environment
+- **Component Distribution**: See which components are active in each environment
+- **Progress Indicators**: Visual representation of component exception ratios
+
+### Navigation Features
+- **Consistent Navigation**: All pages include the same navigation menu
+- **Active Page Indicators**: Always know which section you're viewing
+- **Quick Access**: Jump between Dashboard, Exceptions, Components, Projects, and Environments
+
+### Monitoring URLs
+- 🏠 **Dashboard**: http://localhost:8080
+- 📋 **Exceptions**: http://localhost:8080/exceptions  
+- 🧩 **Components**: http://localhost:8080/components
+- 📁 **Projects**: http://localhost:8080/projects
+- 🌍 **Environments**: http://localhost:8080/environments
+- 🗄️ **H2 Console**: http://localhost:8080/h2-console (dev only)
+
+## ⚙️ Configuration
+
+### Demo Application Configuration (`application.yml`)
+```yaml
+server:
+  port: 8092
+
+spring:
+  application:
+    name: demo-app
+    version: 1.2.0
+
+exception:
+  handler:
+    project-name: demo-application
+    component-name: demo-app
+    pod-name: demo-pod-001
+    pod-ip: 192.168.1.100
+    cluster-name: development-cluster
+    environment: UAT
+    kafka:
+      topic: exceptions
+      bootstrap-servers: localhost:9092
+```
+
+### Environment Variables Support
+All configuration values support environment variable overrides:
+```bash
+export PROJECT_NAME=my-production-app
+export ENVIRONMENT=PROD
+export KAFKA_BOOTSTRAP_SERVERS=prod-kafka:9092
+```
+
+## 🔗 API Endpoints
+
+### Demo Application Test Endpoints
+
+#### 1. Basic Exception Test
+```bash
+curl "http://localhost:8092/api/throw-exception?type=runtime"
+```
+
+#### 2. Exception with HTTP Headers (Recommended)
+```bash
+curl --location 'http://localhost:8092/api/throw-exception-with-headers?type=runtime&debug=true' \
+     --header 'X-Custom-Header: TestValue' \
+     --header 'Accept: application/json' \
+     --header 'Authorization: Bearer token123'
+```
+
+#### 3. Validation Error Test
+```bash
+curl "http://localhost:8092/api/validation-error?email=invalid-email"
+```
+
+#### 4. Database Error Simulation
+```bash
+curl "http://localhost:8092/api/database-error"
+```
+
+#### 5. User Processing Error
+```bash
+curl -X POST "http://localhost:8092/api/user/999" \
+     -H "Content-Type: application/json" \
+     -d '{"name": "Test User", "email": "test@example.com"}'
+```
+
+#### 6. Configuration Check
+```bash
+curl "http://localhost:8092/api/config"
+```
+
+### What Gets Captured
+- ✅ **Exception Details**: Type, message, full stack trace
+- ✅ **HTTP Information**: Method, URL, headers, parameters
+- ✅ **System Context**: Project, component, pod, cluster, environment
+- ✅ **Request Data**: Remote address, user agent, session ID
+- ✅ **Custom Data**: Any additional data you provide
+- ✅ **Security**: Sensitive headers automatically masked
+
+## 📚 Library Usage
+
+### 1. Add Dependency
+```gradle
+dependencies {
+    implementation "com.example:exception-handler-library:1.0.0"
+}
+```
+
+### 2. Configure Your Application
 ```yaml
 exception:
   handler:
-    project-name: ${PROJECT_NAME:demo-application}
-    pod-name: ${POD_NAME:demo-pod-001}
-    pod-ip: ${POD_IP:192.168.1.100}
-    cluster-name: ${CLUSTER_NAME:development-cluster}
-    environment: ${ENVIRONMENT:UAT}
+    project-name: ${PROJECT_NAME:my-application}
+    component-name: ${COMPONENT_NAME:my-component}
+    pod-name: ${POD_NAME:my-pod-001}
+    pod-ip: ${POD_IP:192.168.1.10}
+    cluster-name: ${CLUSTER_NAME:production}
+    environment: ${ENVIRONMENT:PROD}
     kafka:
       topic: exceptions
       bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 ```
 
-## Test Endpoint'leri
-
-### Demo App API Endpoint'leri:
-
-1. **Basit Exception Test**
-```bash
-curl "http://localhost:8092/api/throw-exception?type=runtime"
-```
-
-2. **Validation Error Test**
-```bash
-curl "http://localhost:8092/api/validation-error?email=invalid-email"
-```
-
-3. **Database Error Test**
-```bash
-curl "http://localhost:8092/api/database-error"
-```
-
-4. **User Processing Error Test**
-```bash
-curl -X POST "http://localhost:8092/api/user/999" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Test User"}'
-```
-
-5. **Exception with HTTP Headers Test**
-```bash
-curl -H "X-Custom-Header: TestValue" \
-     -H "Accept: application/json" \
-     "http://localhost:8092/api/throw-exception-with-headers?type=runtime"
-```
-
-## Monitoring Arayüzü
-
-Exception Monitor web arayüzü şu özellikleri sunar:
-
-- **Dashboard**: Genel istatistikler ve son exception'lar
-- **Exception Listesi**: Filtreleme ve pagination ile exception'ları görüntüleme
-- **Exception Detayları**: Stack trace ve ek bilgileri görme
-- **İstatistikler**: Exception tiplerini ve projelere göre dağılımı
-
-### Monitoring URL'leri:
-- Dashboard: http://localhost:8080
-- Exception List: http://localhost:8080/exceptions
-- H2 Console: http://localhost:8080/h2-console
-
-## Library Kullanımı
-
-Kendi Spring Boot projenizde kullanmak için:
-
-1. Dependency ekleyin:
-```gradle
-implementation "com.example:exception-handler-library:1.0.0"
-```
-
-2. Konfigürasyon ekleyin:
-```yaml
-exception:
-  handler:
-    project-name: my-project
-    pod-name: my-pod
-    pod-ip: 192.168.1.10
-    cluster-name: production
-    environment: PROD
-```
-
-3. Exception'ları handle edin:
+### 3. Use in Your Code
 ```java
-@Autowired
-private ExceptionHandler exceptionHandler;
-
-try {
-    // Risky operation
-} catch (Exception e) {
-    // Basit kullanım
-    exceptionHandler.handle(e);
+@RestController
+public class MyController {
     
-    // Ek data ile
-    Map<String, Object> additionalData = new HashMap<>();
-    additionalData.put("userId", userId);
-    exceptionHandler.handle(e, additionalData);
+    @Autowired
+    private ExceptionHandler exceptionHandler;
     
-    // HTTP headers'ı otomatik olarak ekler
-    exceptionHandler.handleWithHttpHeaders(e);
-    
-    // HTTP headers + ek data
-    exceptionHandler.handleWithHttpHeaders(e, additionalData);
+    @GetMapping("/api/my-endpoint")
+    public ResponseEntity<String> myEndpoint(@RequestParam String param) {
+        try {
+            // Your business logic here
+            return ResponseEntity.ok("Success");
+        } catch (Exception e) {
+            // Option 1: Basic exception handling
+            exceptionHandler.handle(e);
+            
+            // Option 2: With additional data
+            Map<String, Object> additionalData = new HashMap<>();
+            additionalData.put("param", param);
+            additionalData.put("operation", "my-endpoint");
+            exceptionHandler.handle(e, additionalData);
+            
+            // Option 3: With HTTP headers (recommended)
+            exceptionHandler.handleWithHttpHeaders(e);
+            
+            // Option 4: With HTTP headers + additional data
+            exceptionHandler.handleWithHttpHeaders(e, additionalData);
+            
+            return ResponseEntity.internalServerError()
+                .body("Error occurred and logged to monitoring system");
+        }
+    }
 }
 ```
 
-## Özellikler
+### Method Options
 
-- ✅ Otomatik Kafka producer konfigürasyonu
-- ✅ HTTP request bilgilerini otomatik yakalama
-- ✅ Environment variable desteği
-- ✅ Web tabanlı monitoring arayüzü
-- ✅ Exception istatistikleri ve filtreleme
-- ✅ H2 in-memory database (geliştirme için)
-- ✅ Responsive web tasarımı
-- ✅ Bootstrap ile modern UI
+| Method | Description | HTTP Headers | Custom Data |
+|--------|-------------|--------------|-------------|
+| `handle(exception)` | Basic exception handling | ❌ | ❌ |
+| `handle(exception, data)` | With custom data | ❌ | ✅ |
+| `handleWithHttpHeaders(exception)` | Auto-captures HTTP context | ✅ | ❌ |
+| `handleWithHttpHeaders(exception, data)` | HTTP context + custom data | ✅ | ✅ |
 
-## Geliştirme Notları
+## 🛠️ Development
 
-- Exception Monitor varsayılan olarak H2 in-memory database kullanır
-- Production ortamında PostgreSQL veya MySQL kullanılmalı
-- Kafka topic'i otomatik oluşturulmaz, manuel oluşturulmalı
-- Log seviyesi DEBUG olarak ayarlanmış, production'da INFO'ya çekilmeli
+### Project Structure
+```
+exception-handling-system/
+├── exception-handler-library/    # Reusable library
+├── exception-monitor/            # Monitoring service
+├── demo-app/                    # Example implementation
+├── images/                      # Documentation images
+├── docker-compose.yml          # Kafka setup
+└── README.md                   # This file
+```
+
+### Development Setup
+1. **Start Kafka**: `docker-compose up -d`
+2. **Build Library**: `./gradlew :exception-handler-library:publishToMavenLocal`
+3. **IDE Setup**: Import as Gradle project, use Java 17
+4. **Database**: H2 in-memory for development (check console at `/h2-console`)
+
+### Production Considerations
+- 🗄️ **Database**: Replace H2 with PostgreSQL or MySQL
+- 📡 **Kafka**: Use production Kafka cluster
+- 🔧 **Logging**: Set log level to INFO or WARN
+- 🚀 **Performance**: Configure appropriate JVM settings
+- 🔐 **Security**: Review sensitive data masking rules
+
+### Building for Production
+```bash
+# Build all modules
+./gradlew build
+
+# Build specific module
+./gradlew :exception-monitor:bootJar
+./gradlew :demo-app:bootJar
+
+# Run tests
+./gradlew test
+```
+
+## 📈 Monitoring Capabilities
+
+### Dashboard Metrics
+- **Real-time Counts**: Total, 24-hour, and hourly exception counts
+- **Exception Types**: Top exception types with counts
+- **Project Statistics**: Exception distribution across projects
+- **Component Analysis**: Most problematic components
+- **Environment Health**: Exception trends by environment
+
+### Advanced Filtering
+- **Date Range**: Filter exceptions by time period
+- **Project Filter**: View exceptions for specific projects
+- **Exception Type**: Filter by exception class
+- **Environment**: Focus on specific deployment environments
+- **Component**: Drill down to specific application components
+
+### Export and Integration
+- **JSON API**: All data available via REST API
+- **Real-time**: Live updates as exceptions occur
+- **Historical Data**: Full exception history with search capabilities
+
+---
+
+## 🤝 Contributing
+
+This is a demonstration project showing Spring Boot exception handling patterns. Feel free to use, modify, and extend for your specific needs.
+
+## 📄 License
+
+This project is for educational and demonstration purposes.
+
+---
+
+**Built with ❤️ using Spring Boot, Apache Kafka, and Bootstrap**
