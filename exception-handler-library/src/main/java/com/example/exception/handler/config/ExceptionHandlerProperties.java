@@ -12,6 +12,7 @@ public class ExceptionHandlerProperties {
     private String podName;
     private String podIp;
     private String clusterName;
+    private String environment;
     
     private Kafka kafka = new Kafka();
     

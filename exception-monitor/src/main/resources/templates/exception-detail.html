@@ -72,17 +72,18 @@
                             <span class="badge bg-secondary info-badge" th:if="${exception.podName}" th:text="'Pod: ' + ${exception.podName}">Pod: PodName</span>
                             <span class="badge bg-info info-badge" th:if="${exception.podIp}" th:text="'IP: ' + ${exception.podIp}">IP: 192.168.1.100</span>
                             <span class="badge bg-success info-badge" th:if="${exception.clusterName}" th:text="'Cluster: ' + ${exception.clusterName}">Cluster: ClusterName</span>
+                            <span class="badge bg-warning info-badge" th:if="${exception.environment}" th:text="'Env: ' + ${exception.environment}">Env: UAT</span>
                         </div>
                         
                         <h6><i class="fas fa-globe"></i> HTTP Request Information</h6>
-                        <div class="mb-3" th:if="${exception.method or exception.url}">
+                        <div class="mb-3" th:if="${exception.method != null or exception.url != null}">
                             <span class="badge bg-primary info-badge" th:if="${exception.method}" th:text="${exception.method}">GET</span>
                             <br th:if="${exception.method}">
                             <small class="text-muted" th:if="${exception.url}" th:text="${exception.url}">http://localhost:8080/api/test</small>
                             <br th:if="${exception.serviceName}">
                             <small class="text-muted">Service: <span th:text="${exception.serviceName}">ServiceName</span></small>
                         </div>
-                        <div th:unless="${exception.method or exception.url}">
+                        <div th:unless="${exception.method != null or exception.url != null}">
                             <small class="text-muted">No HTTP request information available</small>
                         </div>
                     </div>

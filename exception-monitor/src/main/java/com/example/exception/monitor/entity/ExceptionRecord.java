@@ -41,6 +41,9 @@ public class ExceptionRecord {
     @Column(name = "cluster_name")
     private String clusterName;
     
+    @Column(name = "environment")
+    private String environment;
+    
     @Column(name = "service_name")
     private String serviceName;
     

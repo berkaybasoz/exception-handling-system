@@ -20,6 +20,7 @@ public class ExceptionDto {
     private String podName;
     private String podIp;
     private String clusterName;
+    private String environment;
     private String serviceName;
     private String method;
     private String url;

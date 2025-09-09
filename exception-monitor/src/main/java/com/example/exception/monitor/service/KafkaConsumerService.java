@@ -60,6 +60,7 @@ public class KafkaConsumerService {
         record.setPodName(getStringValue(jsonNode, "podName"));
         record.setPodIp(getStringValue(jsonNode, "podIp"));
         record.setClusterName(getStringValue(jsonNode, "clusterName"));
+        record.setEnvironment(getStringValue(jsonNode, "environment"));
         record.setServiceName(getStringValue(jsonNode, "serviceName"));
         record.setMethod(getStringValue(jsonNode, "method"));
         record.setUrl(getStringValue(jsonNode, "url"));

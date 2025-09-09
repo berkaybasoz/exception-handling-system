@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.service.DemoService;
+import com.example.exception.handler.config.ExceptionHandlerProperties;
 import com.example.exception.handler.service.ExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,24 @@ public class DemoController {
     
     private final DemoService demoService;
     private final ExceptionHandler exceptionHandler;
+    private final ExceptionHandlerProperties properties;
     
     @GetMapping("/hello")
     public ResponseEntity<String> hello() {
         return ResponseEntity.ok("Hello from Demo Application!");
+    }
+    
+    @GetMapping("/config")
+    public ResponseEntity<Map<String, Object>> getConfig() {
+        Map<String, Object> config = new HashMap<>();
+        config.put("projectName", properties.getProjectName());
+        config.put("podName", properties.getPodName());
+        config.put("podIp", properties.getPodIp());
+        config.put("clusterName", properties.getClusterName());
+        config.put("environment", properties.getEnvironment());
+        config.put("kafkaTopic", properties.getKafka().getTopic());
+        config.put("kafkaBootstrapServers", properties.getKafka().getBootstrapServers());
+        return ResponseEntity.ok(config);
     }
     
     @GetMapping("/throw-exception")

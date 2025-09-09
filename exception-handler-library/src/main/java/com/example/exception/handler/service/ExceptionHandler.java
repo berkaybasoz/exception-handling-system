@@ -64,6 +64,7 @@ public class ExceptionHandler {
         dto.setPodName(properties.getPodName());
         dto.setPodIp(properties.getPodIp());
         dto.setClusterName(properties.getClusterName());
+        dto.setEnvironment(properties.getEnvironment());
         
         // HTTP request bilgileri (varsa)
         try {

@@ -56,6 +56,7 @@ exception:
     pod-name: ${POD_NAME:demo-pod-001}
     pod-ip: ${POD_IP:192.168.1.100}
     cluster-name: ${CLUSTER_NAME:development-cluster}
+    environment: ${ENVIRONMENT:UAT}
     kafka:
       topic: exceptions
       bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
@@ -118,6 +119,7 @@ exception:
     pod-name: my-pod
     pod-ip: 192.168.1.10
     cluster-name: production
+    environment: PROD
 ```
 
 3. Exception'ları handle edin:

@@ -19,14 +19,21 @@
       "sourceType": "com.example.exception.handler.config.ExceptionHandlerProperties"
     },
     {
+      "name": "exception.handler.environment",
+      "type": "java.lang.String",
+      "sourceType": "com.example.exception.handler.config.ExceptionHandlerProperties"
+    },
+    {
       "name": "exception.handler.kafka.bootstrap-servers",
       "type": "java.lang.String",
-      "sourceType": "com.example.exception.handler.config.ExceptionHandlerProperties$Kafka"
+      "sourceType": "com.example.exception.handler.config.ExceptionHandlerProperties$Kafka",
+      "defaultValue": "localhost:9092"
     },
     {
       "name": "exception.handler.kafka.topic",
       "type": "java.lang.String",
-      "sourceType": "com.example.exception.handler.config.ExceptionHandlerProperties$Kafka"
+      "sourceType": "com.example.exception.handler.config.ExceptionHandlerProperties$Kafka",
+      "defaultValue": "exceptions"
     },
     {
       "name": "exception.handler.pod-ip",
