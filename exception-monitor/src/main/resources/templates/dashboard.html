@@ -239,8 +239,8 @@
                                 </thead>
                                 <tbody>
                                     <tr th:each="exception : ${recentExceptions}">
-                                        <td th:text="${#temporals.format(exception.timestamp, 'yyyy-MM-dd HH:mm:ss')}">
-                                            2023-01-01 12:00:00
+                                        <td>
+                                            <small th:text="${#temporals.format(exception.timestamp, 'MM/dd HH:mm')}">01/01 12:00</small>
                                         </td>
                                         <td>
                                             <span class="badge bg-danger" th:text="${exception.exceptionType}">
