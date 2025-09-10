@@ -142,10 +142,11 @@ public class ExceptionRecordService {
         return repository.countByTimestampBetween(startDate, endDate);
     }
     
-    // Filtered search with service and method
+    // Filtered search with service, method and request headers
     public Page<ExceptionRecord> findWithAllFilters(String projectName, String exceptionType, 
                                                    String environment, String componentName,
                                                    String serviceName, String method,
+                                                   String requestHeaderFilter, String headerFilterType,
                                                    LocalDateTime startDate, LocalDateTime endDate, 
                                                    Pageable pageable) {
         
@@ -155,11 +156,31 @@ public class ExceptionRecordService {
         String normalizedComponentName = (componentName != null && componentName.trim().isEmpty()) ? null : componentName;
         String normalizedServiceName = (serviceName != null && serviceName.trim().isEmpty()) ? null : serviceName;
         String normalizedMethod = (method != null && method.trim().isEmpty()) ? null : method;
+        String normalizedHeaderFilter = (requestHeaderFilter != null && requestHeaderFilter.trim().isEmpty()) ? null : requestHeaderFilter;
         
-        return repository.findWithAllFilters(normalizedProjectName, normalizedExceptionType, 
+        return repository.findWithAllFiltersIncludingHeaders(normalizedProjectName, normalizedExceptionType, 
                                            normalizedEnvironment, normalizedComponentName,
                                            normalizedServiceName, normalizedMethod,
+                                           normalizedHeaderFilter, headerFilterType,
                                            startDate, endDate, pageable);
+    }
+    
+    // Advanced query search
+    public Page<ExceptionRecord> findWithAdvancedQuery(String advancedQuery, String projectName, String exceptionType,
+                                                      String environment, String componentName, String serviceName,
+                                                      String method, LocalDateTime startDate, LocalDateTime endDate,
+                                                      Pageable pageable) {
+        
+        String normalizedProjectName = (projectName != null && projectName.trim().isEmpty()) ? null : projectName;
+        String normalizedExceptionType = (exceptionType != null && exceptionType.trim().isEmpty()) ? null : exceptionType;
+        String normalizedEnvironment = (environment != null && environment.trim().isEmpty()) ? null : environment;
+        String normalizedComponentName = (componentName != null && componentName.trim().isEmpty()) ? null : componentName;
+        String normalizedServiceName = (serviceName != null && serviceName.trim().isEmpty()) ? null : serviceName;
+        String normalizedMethod = (method != null && method.trim().isEmpty()) ? null : method;
+        
+        return repository.findWithAdvancedQuery(advancedQuery, normalizedProjectName, normalizedExceptionType,
+                                               normalizedEnvironment, normalizedComponentName, normalizedServiceName,
+                                               normalizedMethod, startDate, endDate, pageable);
     }
     
     // Time-filtered statistics methods

@@ -132,6 +132,7 @@ public class ExceptionMonitorController {
             @RequestParam(required = false) String componentName,
             @RequestParam(required = false) String serviceName,
             @RequestParam(required = false) String method,
+            @RequestParam(required = false) String advancedQuery,
             @RequestParam(required = false) String timeRange,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime customStartDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime customEndDate,
@@ -182,10 +183,17 @@ public class ExceptionMonitorController {
         Pageable pageable = PageRequest.of(page, size);
         Page<ExceptionRecord> exceptions;
         
-        // Use the extended filter method with service and method
-        exceptions = exceptionRecordService.findWithAllFilters(projectName, exceptionType, environment, 
-                                                             componentName, serviceName, method,
-                                                             startDate, endDate, pageable);
+        // Use advanced query if provided, otherwise use standard filters
+        if (advancedQuery != null && !advancedQuery.trim().isEmpty()) {
+            exceptions = exceptionRecordService.findWithAdvancedQuery(advancedQuery, projectName, exceptionType, 
+                                                                    environment, componentName, serviceName, method,
+                                                                    startDate, endDate, pageable);
+        } else {
+            exceptions = exceptionRecordService.findWithAllFilters(projectName, exceptionType, environment, 
+                                                                 componentName, serviceName, method,
+                                                                 null, null,
+                                                                 startDate, endDate, pageable);
+        }
         
         // Get distinct values for filter dropdowns
         model.addAttribute("distinctProjects", exceptionRecordService.getDistinctProjects());
@@ -203,6 +211,7 @@ public class ExceptionMonitorController {
         model.addAttribute("componentName", componentName);
         model.addAttribute("serviceName", serviceName);
         model.addAttribute("method", method);
+        model.addAttribute("advancedQuery", advancedQuery);
         model.addAttribute("selectedTimeRange", timeRange != null ? timeRange : "all");
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);

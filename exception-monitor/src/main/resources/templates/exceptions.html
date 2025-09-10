@@ -38,6 +38,7 @@
                     <input type="hidden" name="componentName" th:value="${componentName}">
                     <input type="hidden" name="serviceName" th:value="${serviceName}">
                     <input type="hidden" name="method" th:value="${method}">
+                    <input type="hidden" name="advancedQuery" th:value="${advancedQuery}">
                     
                     <div class="d-flex justify-content-end align-items-center">
                         <div class="btn-group me-2" role="group">
@@ -140,6 +141,33 @@
                             </select>
                         </div>
                     </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <label for="advancedQuery" class="form-label">
+                                Advanced Query 
+                                <button type="button" class="btn btn-sm btn-link p-0 ms-2" data-bs-toggle="modal" data-bs-target="#queryHelpModal">
+                                    <i class="fas fa-question-circle"></i> Help
+                                </button>
+                            </label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="advancedQuery" name="advancedQuery" 
+                                       th:value="${advancedQuery}" 
+                                       placeholder='e.g., headers.User-Agent:"Chrome" AND params.userId:123 OR additionalData.level:"ERROR"'
+                                       style="font-family: monospace;">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-history"></i> Recent
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item query-example" href="#">headers.Authorization:"Bearer"</a></li>
+                                    <li><a class="dropdown-item query-example" href="#">params.userId:* AND headers.User-Agent:"Chrome"</a></li>
+                                    <li><a class="dropdown-item query-example" href="#">additionalData.level:"ERROR" OR additionalData.level:"FATAL"</a></li>
+                                    <li><a class="dropdown-item query-example" href="#">headers.*:"localhost" AND method:"POST"</a></li>
+                                    <li><a class="dropdown-item query-example" href="#">NOT headers.Authorization:* AND environment:"PROD"</a></li>
+                                </ul>
+                            </div>
+                            <small class="text-muted">Use Splunk-like syntax to search headers, params, and additional data. Supports AND, OR, NOT operators.</small>
+                        </div>
+                    </div>
                     <div class="row mt-2">
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary me-2">
@@ -231,7 +259,7 @@
                 <nav aria-label="Exception pagination" th:if="${exceptions.totalPages > 1}">
                     <ul class="pagination justify-content-center">
                         <li class="page-item" th:classappend="${!exceptions.hasPrevious()} ? 'disabled'">
-                            <a class="page-link" th:href="@{/exceptions(page=${currentPage - 1}, projectName=${projectName}, exceptionType=${exceptionType}, environment=${environment}, componentName=${componentName}, serviceName=${serviceName}, method=${method}, timeRange=${selectedTimeRange}, customStartDate=${customStartDate}, customEndDate=${customEndDate})}">
+                            <a class="page-link" th:href="@{/exceptions(page=${currentPage - 1}, projectName=${projectName}, exceptionType=${exceptionType}, environment=${environment}, componentName=${componentName}, serviceName=${serviceName}, method=${method}, advancedQuery=${advancedQuery}, timeRange=${selectedTimeRange}, customStartDate=${customStartDate}, customEndDate=${customEndDate})}">
                                 <i class="fas fa-chevron-left"></i> Previous
                             </a>
                         </li>
@@ -239,12 +267,12 @@
                         <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, exceptions.totalPages - 1)}"
                             th:classappend="${pageNum == currentPage} ? 'active'"
                             th:if="${pageNum >= (currentPage - 2) and pageNum <= (currentPage + 2)}">
-                            <a class="page-link" th:href="@{/exceptions(page=${pageNum}, projectName=${projectName}, exceptionType=${exceptionType}, environment=${environment}, componentName=${componentName}, serviceName=${serviceName}, method=${method}, timeRange=${selectedTimeRange}, customStartDate=${customStartDate}, customEndDate=${customEndDate})}"
+                            <a class="page-link" th:href="@{/exceptions(page=${pageNum}, projectName=${projectName}, exceptionType=${exceptionType}, environment=${environment}, componentName=${componentName}, serviceName=${serviceName}, method=${method}, advancedQuery=${advancedQuery}, timeRange=${selectedTimeRange}, customStartDate=${customStartDate}, customEndDate=${customEndDate})}"
                                th:text="${pageNum + 1}">1</a>
                         </li>
                         
                         <li class="page-item" th:classappend="${!exceptions.hasNext()} ? 'disabled'">
-                            <a class="page-link" th:href="@{/exceptions(page=${currentPage + 1}, projectName=${projectName}, exceptionType=${exceptionType}, environment=${environment}, componentName=${componentName}, serviceName=${serviceName}, method=${method}, timeRange=${selectedTimeRange}, customStartDate=${customStartDate}, customEndDate=${customEndDate})}">
+                            <a class="page-link" th:href="@{/exceptions(page=${currentPage + 1}, projectName=${projectName}, exceptionType=${exceptionType}, environment=${environment}, componentName=${componentName}, serviceName=${serviceName}, method=${method}, advancedQuery=${advancedQuery}, timeRange=${selectedTimeRange}, customStartDate=${customStartDate}, customEndDate=${customEndDate})}">
                                 Next <i class="fas fa-chevron-right"></i>
                             </a>
                         </li>
@@ -277,6 +305,73 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" onclick="applyCustomDateRange()">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Query Help Modal -->
+    <div class="modal fade" id="queryHelpModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Advanced Query Syntax Help</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Query Syntax</h6>
+                    <p>Use Splunk/OpenSearch-like syntax to filter exceptions based on headers, parameters, and additional data.</p>
+                    
+                    <h6>Basic Syntax</h6>
+                    <ul>
+                        <li><code>field:value</code> - Exact match</li>
+                        <li><code>field:"value with spaces"</code> - Use quotes for values with spaces</li>
+                        <li><code>field:*</code> - Field exists (any value)</li>
+                        <li><code>field:val*</code> - Starts with "val"</li>
+                        <li><code>field:*val</code> - Ends with "val"</li>
+                        <li><code>field:*val*</code> - Contains "val"</li>
+                    </ul>
+                    
+                    <h6>Field Prefixes</h6>
+                    <ul>
+                        <li><code>headers.</code> - Search in request headers</li>
+                        <li><code>params.</code> - Search in request parameters</li>
+                        <li><code>additionalData.</code> - Search in additional data</li>
+                        <li>No prefix - Search in standard fields (exceptionType, message, etc.)</li>
+                    </ul>
+                    
+                    <h6>Operators</h6>
+                    <ul>
+                        <li><code>AND</code> - Both conditions must match</li>
+                        <li><code>OR</code> - Either condition must match</li>
+                        <li><code>NOT</code> - Exclude matches</li>
+                        <li>Parentheses <code>()</code> - Group conditions</li>
+                    </ul>
+                    
+                    <h6>Examples</h6>
+                    <div class="bg-light p-2 mb-2">
+                        <code>headers.User-Agent:"Chrome"</code><br>
+                        <small>Find exceptions where User-Agent header contains "Chrome"</small>
+                    </div>
+                    <div class="bg-light p-2 mb-2">
+                        <code>params.userId:123 AND headers.Authorization:*</code><br>
+                        <small>Find exceptions with userId=123 and any Authorization header</small>
+                    </div>
+                    <div class="bg-light p-2 mb-2">
+                        <code>(headers.Host:"localhost" OR headers.Host:"127.0.0.1") AND method:"POST"</code><br>
+                        <small>Find POST requests to localhost or 127.0.0.1</small>
+                    </div>
+                    <div class="bg-light p-2 mb-2">
+                        <code>NOT headers.Authorization:* AND environment:"PROD"</code><br>
+                        <small>Find production exceptions without Authorization header</small>
+                    </div>
+                    <div class="bg-light p-2 mb-2">
+                        <code>additionalData.level:"ERROR" OR additionalData.level:"FATAL"</code><br>
+                        <small>Find exceptions with ERROR or FATAL level in additional data</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -337,6 +432,14 @@
             
             document.getElementById('customEndDate').value = now.toISOString().slice(0, 16);
             document.getElementById('customStartDate').value = yesterday.toISOString().slice(0, 16);
+            
+            // Query example click handler
+            document.querySelectorAll('.query-example').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('advancedQuery').value = this.textContent;
+                });
+            });
         });
     </script>
 </body>

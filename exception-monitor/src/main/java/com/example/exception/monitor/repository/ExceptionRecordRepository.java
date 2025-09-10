@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ExceptionRecordRepository extends JpaRepository<ExceptionRecord, String> {
+public interface ExceptionRecordRepository extends JpaRepository<ExceptionRecord, String>, ExceptionRecordRepositoryCustom {
     
     Page<ExceptionRecord> findAllByOrderByTimestampDesc(Pageable pageable);
     
@@ -160,6 +160,35 @@ public interface ExceptionRecordRepository extends JpaRepository<ExceptionRecord
         @Param("componentName") String componentName,
         @Param("serviceName") String serviceName,
         @Param("method") String method,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate,
+        Pageable pageable);
+    
+    // Extended filter query with service, method and request headers
+    @Query("SELECT e FROM ExceptionRecord e WHERE " +
+           "(:projectName IS NULL OR e.projectName = :projectName) AND " +
+           "(:exceptionType IS NULL OR e.exceptionType = :exceptionType) AND " +
+           "(:environment IS NULL OR e.environment = :environment) AND " +
+           "(:componentName IS NULL OR e.componentName = :componentName) AND " +
+           "(:serviceName IS NULL OR e.serviceName = :serviceName) AND " +
+           "(:method IS NULL OR e.method = :method) AND " +
+           "(:startDate IS NULL OR e.timestamp >= :startDate) AND " +
+           "(:endDate IS NULL OR e.timestamp <= :endDate) AND " +
+           "(:headerFilter IS NULL OR " +
+           "  (:filterType = 'key' AND e.additionalData LIKE CONCAT('%\"httpHeaders\":{%', :headerFilter, '%')) OR " +
+           "  (:filterType = 'value' AND e.additionalData LIKE CONCAT('%\"httpHeaders\":%', :headerFilter, '%')) OR " +
+           "  (:filterType = 'both' AND e.additionalData LIKE CONCAT('%\"httpHeaders\":%', :headerFilter, '%'))" +
+           ") " +
+           "ORDER BY e.timestamp DESC")
+    Page<ExceptionRecord> findWithAllFiltersIncludingHeaders(
+        @Param("projectName") String projectName,
+        @Param("exceptionType") String exceptionType,
+        @Param("environment") String environment,
+        @Param("componentName") String componentName,
+        @Param("serviceName") String serviceName,
+        @Param("method") String method,
+        @Param("headerFilter") String headerFilter,
+        @Param("filterType") String filterType,
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate,
         Pageable pageable);
